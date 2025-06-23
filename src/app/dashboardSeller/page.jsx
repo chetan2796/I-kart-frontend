@@ -1,6 +1,8 @@
+'use client'
 import FabricCanvas from "../components/FabricCanvas";
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect } from "react";
 
 const DashboardSeller = () => {
   const products = [
@@ -35,6 +37,14 @@ const DashboardSeller = () => {
       image: "/images/login-bg-image.png",
     },
   ];
+
+  const getData = async () => {
+    const response = await fetch('http://localhost:3000/')
+  }
+
+  useEffect(() => {
+    getData()
+  }, [])
 
   return (
     <div className="container mx-auto px-4 py-6">
