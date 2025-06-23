@@ -1,11 +1,11 @@
 'use client';
+
+import Sidebar from "../components/Sidebar"; 
 import FabricCanvas from "../components/FabricCanvas";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect } from "react";
-import Sidebar from "../components/Sidebar";
 
-const DashboardSeller = () => {
+const DashboardStore = () => {
   const products = [
     { name: "Hwll", price: 12.0, image: "/images/login-bg-image.png" },
     { name: "Dfd", price: 12121.0, image: "/images/login-bg-image.png" },
@@ -19,7 +19,7 @@ const DashboardSeller = () => {
     },
     {
       name: "T Shirt9",
-      description: "this is new description",
+      description: "this is new descriptions",
       image: "/images/login-bg-image.png",
     },
     {
@@ -38,38 +38,24 @@ const DashboardSeller = () => {
       image: "/images/login-bg-image.png",
     },
   ];
-
-  const getData = async () => {
-    const response = await fetch('http://localhost:3000/')
-  }
-
-  useEffect(() => {
-    getData()
-  }, [])
-
+ 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar */}
+    <div className="flex min-h-screen">
       <Sidebar />
 
-      {/* Main Content */}
-      <div className="flex-1 px-4 py-6">
-        <h1 className="text-3xl font-bold mb-6 text-gray-800">Products</h1>
+      <div className="flex-1 container mx-auto px-4 py-6">
+        <h1 className="text-2xl font-bold mb-6">Products</h1>
 
-        <Link href="/newProducts">
-          <button className="bg-amber-400 text-black px-4 py-2 rounded mb-6 hover:bg-amber-500 transition">
-            New Product
-          </button>
-        </Link>
+        <button className="bg-amber-400 text-black px-4 py-2 rounded mb-4">
+          <Link href="/newProducts">New Product</Link>
+        </button>
 
-        {/* Product Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {products.map((product, index) => (
             <div
               key={index}
               className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow"
             >
-              {/* Product Image */}
               <div className="relative h-40 mb-3 rounded-md overflow-hidden bg-gray-100">
                 {product.image && (
                   <Image
@@ -77,40 +63,35 @@ const DashboardSeller = () => {
                     alt={product.name}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                     priority={index < 3}
                   />
                 )}
               </div>
 
-              {/* Product Name */}
-              <h2 className="text-lg font-semibold text-gray-800 line-clamp-1">
-                {product.name}
-              </h2>
+              <h2 className="text-lg font-medium line-clamp-1 text-black">{product.name}</h2>
 
-              {/* Price Section */}
-              <div className="mt-2">
+              <div className="mt-1">
                 {product.salePrice ? (
                   <div className="flex gap-2 items-center">
-                    <span className="text-red-600 font-semibold">
+                    <span className="text-red-500 font-semibold text-black">
                       ${product.salePrice.toFixed(2)}
                     </span>
-                    <span className="text-gray-400 line-through">
+                    <span className="text-gray-400 text-sm line-through text-black">
                       ${product.price.toFixed(2)}
                     </span>
                   </div>
                 ) : (
                   product.price && (
-                    <span className="text-gray-800 font-medium">
+                    <span className="font-medium text-black">
                       ${product.price.toFixed(2)}
                     </span>
                   )
                 )}
               </div>
 
-              {/* Description */}
               {product.description && (
-                <p className="text-gray-500 text-sm mt-2 line-clamp-2">
+                <p className="text-gray-500 text-sm mt-1 line-clamp-2 text-black">
                   {product.description}
                 </p>
               )}
@@ -122,4 +103,4 @@ const DashboardSeller = () => {
   );
 };
 
-export default DashboardSeller;
+export default DashboardStore;
