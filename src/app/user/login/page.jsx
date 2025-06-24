@@ -15,7 +15,7 @@ export default function LoginPage() {
     const users = JSON.parse(localStorage.getItem("users")) || [];
 
     const matchedUser = users.find(
-      (user) => user.email === form.email && user.password === form.password
+      (user) => user.email === form.email
     );
 
     if (matchedUser) {
@@ -45,17 +45,8 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">Password</label>
-              <div className="relative">
-                <input type="password" name="password" placeholder="Password" required value={form.password} onChange={(e) =>
-                    setForm({ ...form, password: e.target.value })
-                  } className="w-full px-4 py-2 pr-10 border border-blue-400 rounded-md focus:outline-none focus:ring-2 text-black focus:ring-blue-500" />
-              </div>
-            </div>
-
             <button type="submit" className="w-full px-4 py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">
-              Log in
+              Sign in
             </button>
           </form>
 

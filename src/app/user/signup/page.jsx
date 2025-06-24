@@ -6,23 +6,37 @@ import { useRouter } from "next/navigation";
 
 export default function User() {
   const router = useRouter();
-  const [form, setForm] = useState({ name: "", email: "", password: "", passwordConfirmation: ""});
+  const [form, setForm] = useState({ email: "", phnNumber: "", username: ""});
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const existingUsers = JSON.parse(localStorage.getItem("users")) || [];
-    const isUserExists = existingUsers.some(user => user.email === form.email);
-    if (isUserExists) {
-      alert("User already exists with this email.");
-      return;
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await fetch("http://localhost:3000/auth/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: form.email,
+        phone: form.phnNumber,
+        username: form.username,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("Signup successful!");
+      router.push("/user/login");
+    } else {
+      alert(data.message || "Signup failed. Try again.");
     }
-    const updatedUsers = [...existingUsers, form];
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-
-    alert("Signup successful!");
-    router.push("/user/login");
-  };
-
+  } catch (error) {
+    console.error("Signup error:", error);
+    alert("Something went wrong. Please try again.");
+  }
+};
 
   return (
     <div className="flex min-h-screen">
@@ -32,27 +46,30 @@ export default function User() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">Name</label>
-              <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Enter your name" className="w-full px-4 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-            </div>
-
-            <div>
               <label className="block mb-1 text-sm font-medium text-gray-700">Email</label>
               <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="Enter your email" className="w-full px-4 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
             </div>
 
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">Password</label>
-              <input type="password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="Enter your password" className="w-full px-4 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+              <label className="block mb-1 text-sm font-medium text-gray-700">Phone</label>
+              <input type="text" required value={form.phnNumber} onChange={(e) => { const onlyNums = e.target.value.replace(/[^0-9]/g, ''); setForm({ ...form, phnNumber: onlyNums }); }} placeholder="Enter your phone number" className="w-full px-4 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" maxLength={10} pattern="[0-9]*"/>
             </div>
 
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">Password Confirmation</label>
-              <input type="password" required value={form.passwordConfirmation} onChange={(e) => setForm({ ...form, passwordConfirmation: e.target.value })} placeholder="Confirm Your Password" className="w-full px-4 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+              <label className="block mb-1 text-sm font-medium text-gray-700">Username</label>
+              <input type="text" required value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} placeholder="Enter your username" className="w-full px-4 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
             </div>
 
             <button type="submit" className="w-full px-4 py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">
               Sign Up
+            </button>
+
+            <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
+              <hr className="w-20" /> or <hr className="w-20" />
+            </div>
+
+            <button className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition">
+              Sign up as seller
             </button>
           </form>
 
