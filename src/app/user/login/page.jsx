@@ -7,24 +7,32 @@ import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ email: "" });
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:3000/auth/otp/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: form.email,
+        }),
+      });
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
+      const data = await response.json();
 
-    const matchedUser = users.find(
-      (user) => user.email === form.email
-    );
-
-    if (matchedUser) {
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("currentUser", JSON.stringify(matchedUser));
-      alert("Login successful!");
-      router.push("/dashboardSeller");
-    } else {
-      alert("Invalid credentials");
+      if (response.ok) {
+        alert("login successful!");
+        router.push("/dashboardSeller");
+      } else {
+        alert(data.message || "login failed. Try again.");
+      }
+    } catch (error) {
+      console.error("login error:", error);
+      alert("Something went wrong. Please try again.");
     }
   };
 
@@ -40,8 +48,8 @@ export default function LoginPage() {
                 E-mail address
               </label>
               <div className="relative">
-                <input type="email"  name="email" placeholder="example@email.com" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })
-                  } className="w-full px-4 py-2 pr-10 border border-blue-400 rounded-md focus:outline-none focus:ring-2 text-black focus:ring-blue-500" />
+                <input type="email" name="email" placeholder="example@email.com" required value={form.email} onChange={(e) => setForm({ email: e.target.value })
+                } className="w-full px-4 py-2 pr-10 border border-blue-400 rounded-md focus:outline-none focus:ring-2 text-black focus:ring-blue-500" />
               </div>
             </div>
 
