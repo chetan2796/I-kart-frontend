@@ -11,6 +11,7 @@ export default function editProducts() {
   const [recentImages, setRecentImages] = useState([]);
   const [productType, setProductType] = useState('tshirt');
   const formRef = useRef(null);
+  const [savedImage, setSavedImage] = useState(null);
   const product = useSelector((state) => state.product.selectedProduct);
   console.log("product==>>", product)
 
@@ -101,7 +102,7 @@ export default function editProducts() {
 
   const loadBaseProductImage = (canvasInstance) => {
     // Using a placeholder image; replace with your carousel logic if needed
-    // const imageSrc = '/images/tshirt.png';
+    const imageSrc = product?.image; // Adjust path as needed
     fabric.Image.fromURL(imageSrc, (img) => {
       img.scaleToWidth(canvasInstance.width * 0.9);
       img.set({
@@ -333,33 +334,55 @@ export default function editProducts() {
     }
   };
 
+  // const validateDesignPosition = (canvasInstance) => {
+  //   const printArea = canvasInstance.getObjects().find((obj) => obj.name === 'print-area');
+  //   if (!printArea) return true;
+  //   const customObjects = canvasInstance.getObjects().filter((obj) =>
+  //     obj.name && obj.name.includes('custom')
+  //   );
+  //   return customObjects.every((obj) => {
+  //     const objBounds = {
+  //       left: obj.left - (obj.width * obj.scaleX) / 2,
+  //       right: obj.left + (obj.width * obj.scaleX) / 2,
+  //       top: obj.top - (obj.height * obj.scaleY) / 2,
+  //       bottom: obj.top + (obj.height * obj.scaleY) / 2,
+  //     };
+  //     const areaBounds = {
+  //       left: printArea.left - printArea.width / 2,
+  //       right: printArea.left + printArea.width / 2,
+  //       top: printArea.top - printArea.height / 2,
+  //       bottom: printArea.top + printArea.height / 2,
+  //     };
+  //     return (
+  //       objBounds.right <= areaBounds.right &&
+  //       objBounds.left >= areaBounds.left &&
+  //       objBounds.bottom <= areaBounds.bottom &&
+  //       objBounds.top >= areaBounds.top
+  //     );
+  //   });
+  // };
+
   const validateDesignPosition = (canvasInstance) => {
     const printArea = canvasInstance.getObjects().find((obj) => obj.name === 'print-area');
     if (!printArea) return true;
-    const customObjects = canvasInstance.getObjects().filter((obj) =>
-      obj.name && obj.name.includes('custom')
+
+    const areaBounds = printArea.getBoundingRect();
+    const customObjects = canvasInstance.getObjects().filter(
+      (obj) => obj.name && obj.name.includes('custom')
     );
+
     return customObjects.every((obj) => {
-      const objBounds = {
-        left: obj.left - (obj.width * obj.scaleX) / 2,
-        right: obj.left + (obj.width * obj.scaleX) / 2,
-        top: obj.top - (obj.height * obj.scaleY) / 2,
-        bottom: obj.top + (obj.height * obj.scaleY) / 2,
-      };
-      const areaBounds = {
-        left: printArea.left - printArea.width / 2,
-        right: printArea.left + printArea.width / 2,
-        top: printArea.top - printArea.height / 2,
-        bottom: printArea.top + printArea.height / 2,
-      };
+      const objBounds = obj.getBoundingRect();
+
       return (
-        objBounds.right <= areaBounds.right &&
         objBounds.left >= areaBounds.left &&
-        objBounds.bottom <= areaBounds.bottom &&
-        objBounds.top >= areaBounds.top
+        objBounds.top >= areaBounds.top &&
+        objBounds.left + objBounds.width <= areaBounds.left + areaBounds.width &&
+        objBounds.top + objBounds.height <= areaBounds.top + areaBounds.height
       );
     });
   };
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -384,7 +407,9 @@ export default function editProducts() {
       const dataURL = canvas.toDataURL({ format: 'png', quality: 1.0 });
       console.log('Design saved:', dataURL); // Replace with actual form submission
       // Optionally, reset the print area border
+      alert('Design saved')
       setupPrintArea(canvas, productType);
+      setSavedImage(dataURL)
     }, 100);
   };
 
@@ -480,6 +505,12 @@ export default function editProducts() {
                 Save Design
               </button>
             </form>
+            {savedImage && (
+              <div style={{ marginTop: 20 }}>
+                <h2>Saved Image Preview:</h2>
+                <img src={savedImage} alt="Design Preview" style={{ maxWidth: '100%' }} />
+              </div>
+            )}
             <div className="mt-4">
               <h5 className="text-lg font-medium">Recent Images</h5>
               <div className="grid grid-cols-2 gap-2">

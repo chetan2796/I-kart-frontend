@@ -4,6 +4,9 @@ import "./globals.css";
 import Header from "./components/Header";
 import SideBar from "./components/Sidebar";
 import { usePathname } from "next/navigation";
+import { useRef } from "react";
+import { Provider } from "react-redux";
+import { makeStore } from './lib/store'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,6 +24,12 @@ const geistMono = Geist_Mono({
 // };
 
 export default function RootLayout({ children }) {
+
+  const storeRef = useRef(undefined)
+  if (!storeRef.current) {
+    // Create the store instance the first time this renders
+    storeRef.current = makeStore()
+  }
   const pathname = usePathname();
   console.log("pathname==>>", pathname)
   const isLoginPage = pathname !== "/";
@@ -28,7 +37,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {isLoginPage && <Header />}
-        {children}
+        <Provider store={storeRef.current}>{children}</Provider>
       </body>
     </html>
   );
