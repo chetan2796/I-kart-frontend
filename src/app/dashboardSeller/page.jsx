@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect } from "react";
 import Sidebar from "../components/Sidebar";
+import Card from "../components/Card";
 
 const DashboardSeller = () => {
   const products = [
@@ -53,6 +54,10 @@ const DashboardSeller = () => {
     getData()
   }, [])
 
+  const cardClickHandler=()=>{
+    
+  }
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
@@ -69,58 +74,9 @@ const DashboardSeller = () => {
         </Link>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
           {products.map((product, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow"
-            >
-              {/* Product Image */}
-              <div className="relative h-40 mb-3 rounded-md overflow-hidden bg-gray-100">
-                {product.image && (
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    priority={index < 3}
-                  />
-                )}
-              </div>
-
-              {/* Product Name */}
-              <h2 className="text-lg font-semibold text-gray-800 line-clamp-1">
-                {product.name}
-              </h2>
-
-              {/* Price Section */}
-              <div className="mt-2">
-                {product.salePrice ? (
-                  <div className="flex gap-2 items-center">
-                    <span className="text-red-600 font-semibold">
-                      ${product.salePrice.toFixed(2)}
-                    </span>
-                    <span className="text-gray-400 line-through">
-                      ${product.price.toFixed(2)}
-                    </span>
-                  </div>
-                ) : (
-                  product.price && (
-                    <span className="text-gray-800 font-medium">
-                      ${product.price.toFixed(2)}
-                    </span>
-                  )
-                )}
-              </div>
-
-              {/* Description */}
-              {product.description && (
-                <p className="text-gray-500 text-sm mt-2 line-clamp-2">
-                  {product.description}
-                </p>
-              )}
-            </div>
+            <Card cardClickHandler={cardClickHandler} product={product} key={product.id} />
           ))}
         </div>
       </div>
