@@ -25,10 +25,16 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
-        alert("login successful!");
-        router.push("/dashboardSeller");
+        alert("Otp sent successfully!");
+        localStorage.setItem("email", form.email);
+        localStorage.setItem("isLoggedIn", "true");
+
+      if (data.previewUrl) {
+        window.open(data.previewUrl, "_blank");
+      }
+        router.push("/user/verifyOtp");
       } else {
-        alert(data.message || "login failed. Try again.");
+        alert(data.message || "error occured. Try again.");
       }
     } catch (error) {
       console.error("login error:", error);
