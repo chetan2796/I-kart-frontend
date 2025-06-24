@@ -7,51 +7,72 @@ import { setSelectedProduct } from "../lib/features/editProducts/editProductSlic
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import Card from '../components/Card'
+import { useEffect, useState } from "react";
 
-const newProducts = () => {
+const NewProducts = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const products = [
-    { id: 1, name: "Hwll", price: 12.0, image: "/images/login-bg-image.png" },
-    { id: 2, name: "Dfd", price: 12121.0, image: "/images/login-bg-image.png" },
-    { id: 3, name: "Fed", price: 12.0, image: "/images/login-bg-image.png" },
-    { id: 4, name: "Products", price: 1222.0, image: "/images/login-bg-image.png" },
-    {
-      id: 5,
-      name: "Product",
-      price: 2000.0,
-      salePrice: 1220.0,
-      image: "/images/login-bg-image.png",
-    },
-    {
-      id: 6,
-      name: "T Shirt9",
-      description: "this is new descriptions",
-      image: "/images/login-bg-image.png",
-    },
-    {
-      id: 7,
-      name: "T Shirt",
-      description: "this is new t-shirt",
-      image: "/images/login-bg-image.png",
-    },
-    {
-      id: 8,
-      name: "Botal Nice",
-      description: "botal_nice",
-      image: "/images/login-bg-image.png",
-    },
-    {
-      id: 9,
-      name: "Botal",
-      description: "botal",
-      image: "/images/login-bg-image.png",
-    },
-  ];
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/products");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setProducts(data);
+      } catch (err) {
+        setError(err.message);
+        console.error("Error fetching products:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const editProductHandler = (product) => {
     router.push(`posts/${product.id}`);
     dispatch(setSelectedProduct(product));
+  };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen">
+        <Sidebar />
+        <div className="container mx-auto px-4 py-6">
+          <h1 className="text-2xl font-bold mb-6">Products</h1>
+          <div className="flex justify-center items-center h-64">
+            <p>Loading products...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen">
+        <Sidebar />
+        <div className="container mx-auto px-4 py-6">
+          <h1 className="text-2xl font-bold mb-6">Products</h1>
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <p>Error loading products: {error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -69,4 +90,4 @@ const newProducts = () => {
   );
 };
 
-export default newProducts;
+export default NewProducts;
