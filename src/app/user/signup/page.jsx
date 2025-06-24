@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 export default function User() {
   const router = useRouter();
-  const [form, setForm] = useState({ email: "", phnNumber: "", username: ""});
+  const [form, setForm] = useState({ email: "", phone: "", username: "", roleId: 1});
 
   const handleSubmit = async (e) => {
   e.preventDefault();
@@ -19,8 +19,9 @@ export default function User() {
       },
       body: JSON.stringify({
         email: form.email,
-        phone: form.phnNumber,
+        phone: form.phone,
         username: form.username,
+        roleId: form.roleId,
       }),
     });
 
@@ -44,7 +45,7 @@ export default function User() {
         <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-2xl shadow-lg">
           <h1 className="text-3xl font-bold text-center text-gray-800">Sign Up</h1>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form id= "signupForm" onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block mb-1 text-sm font-medium text-gray-700">Email</label>
               <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="Enter your email" className="w-full px-4 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
@@ -52,7 +53,7 @@ export default function User() {
 
             <div>
               <label className="block mb-1 text-sm font-medium text-gray-700">Phone</label>
-              <input type="text" required value={form.phnNumber} onChange={(e) => { const onlyNums = e.target.value.replace(/[^0-9]/g, ''); setForm({ ...form, phnNumber: onlyNums }); }} placeholder="Enter your phone number" className="w-full px-4 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" maxLength={10} pattern="[0-9]*"/>
+              <input type="text" required value={form.phone} onChange={(e) => { const onlyNums = e.target.value.replace(/[^0-9]/g, ''); setForm({ ...form, phone: onlyNums }); }} placeholder="Enter your phone number" className="w-full px-4 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" maxLength={10} pattern="[0-9]*"/>
             </div>
 
             <div>
@@ -68,9 +69,19 @@ export default function User() {
               <hr className="w-20" /> or <hr className="w-20" />
             </div>
 
-            <button className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition">
-              Sign up as seller
+            <button
+              type="button"
+              onClick={() => {
+                setForm({ ...form, roleId: 2 });
+                setTimeout(() => {
+                  document.getElementById("signupForm").requestSubmit(); 
+                }, 0);
+              }}
+              className="w-full px-4 py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700"
+            >
+              Sign Up as a Seller
             </button>
+
           </form>
 
           <p className="text-sm text-center text-gray-600">
