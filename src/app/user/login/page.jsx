@@ -40,8 +40,8 @@ export default function LoginPage() {
     <div className="flex min-h-screen">
       <div className="w-full md:w-1/2 flex items-center justify-center p-10 bg-white">
         <div className="max-w-md w-full">
-          <h1 className="text-3xl font-bold mb-6 text-black">Login</h1>
-
+          <h1 className="text-xl font-bold mb-1 text-gray-700">Start your journey</h1>
+          <h1 className="text-4xl font-bold mb-6 text-gray-700">Sign In to i-kart</h1>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block mb-1 text-sm font-medium text-gray-700">
