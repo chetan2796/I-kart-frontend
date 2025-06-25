@@ -142,7 +142,7 @@ const NewProducts = () => {
       <div className="flex min-h-screen">
         <Sidebar />
         <div className="container mx-auto px-4 py-6">
-          <h1 className="text-2xl font-bold mb-6">Products</h1>
+          <h1 className="text-2xl font-bold mb-6">Catalogs</h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
             {products.map((product, index) => (
               <Card cardClickHandler={editProductHandler} product={product} key={product.id} />

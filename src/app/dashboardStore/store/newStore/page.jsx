@@ -28,7 +28,6 @@ export default function AddStoreForm() {
     <RequireAuth>
       <div className="flex min-h-screen bg-gray-100">
         <Sidebar />
-
         <main className="flex-1 flex items-center justify-center p-8">
           <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8">
             <h1 className="text-3xl font-extrabold text-center text-gray-800 mb-8">

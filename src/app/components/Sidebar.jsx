@@ -8,8 +8,7 @@ export default function Sidebar() {
       <h2 className="text-2xl font-bold mb-6">I-Kart</h2>
       <ul className="space-y-4">
         <li className='hover:bg-gray-200 p-2 cursor-pointer'><Link href="/dashboardSeller">Dashboard</Link></li>
-        <li className='hover:bg-gray-200 p-2 cursor-pointer'><Link href="/newProducts">Products</Link></li>
-        <li className='hover:bg-gray-200 p-2 cursor-pointer'><Link href="/dashboardStore">Stores</Link></li>
+        <li className='hover:bg-gray-200 p-2 cursor-pointer'><Link href="/newProducts">Catalogs</Link></li>
         <li className='hover:bg-gray-200 p-2 cursor-pointer'><Link href="/dashboardStore/store">My Stores</Link></li>
       </ul>
     </div>
