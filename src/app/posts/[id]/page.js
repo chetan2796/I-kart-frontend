@@ -523,174 +523,271 @@ export default function editProducts() {
   return (
     <>
       <Head>
-        <title>Design Editor</title>
+        <title>Design Editor | Customize Your Product</title>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" async />
         <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
       </Head>
-      <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4">Design Your Product</h1>
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <canvas ref={canvasRef} width="800" height="600" className="border border-gray-300"></canvas>
-          </div>
-          <div className="w-full md:w-1/3">
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Product Type</label>
-              <select
-                value={productType}
-                onChange={(e) => setProductType(e.target.value)}
-                className="w-full p-2 border rounded"
-              >
-                <option value="tshirt">T-Shirt</option>
-                <option value="mug">Mug</option>
-                <option value="bottle">Bottle</option>
-              </select>
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Text Color</label>
-              <input
-                type="color"
-                value={color}
-                onChange={updateTextColor}
-                className="w-full h-10 border rounded"
-              />
-            </div>
-            <div className="flex gap-2 mb-4">
-              <button
-                onClick={addText}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              >
-                Add Text
-              </button>
-              <button
-                onClick={() => document.getElementById('fileUpload').click()}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-              >
-                Upload Image
-              </button>
-              <input
-                id="fileUpload"
-                type="file"
-                accept="image/*"
-                onChange={handleUpload}
-                className="hidden"
-              />
-              <button
-                onClick={deleteSelected}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-              >
-                Delete Selected
-              </button>
-            </div>
-            <div className="mb-4">
-              <button
-                type="button"
-                className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
-                data-bs-toggle="modal"
-                data-bs-target="#emojiModal"
-              >
-                Add Emoji
-              </button>
-            </div>
-            <form ref={formRef} onSubmit={handleSubmit}>
-              <button
-                type="submit"
-                className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-900"
-              >
-                Save Design
-              </button>
-            </form>
-            {savedImage && (
-              <div style={{ marginTop: 20 }}>
-                <h2>Saved Image Preview:</h2>
-                <img src={savedImage} alt="Design Preview" style={{ maxWidth: '100%' }} />
+
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="container mx-auto px-4 py-6 flex-1">
+          {/* Header */}
+          <header className="mb-6 text-center">
+            <h1 className="text-3xl font-bold text-indigo-700 mb-2">Design Your Product</h1>
+            <p className="text-gray-600">Create a custom design for your {productType}</p>
+          </header>
+
+          {/* Main Content Area */}
+          <div className="flex flex-col h-full">
+            {/* Canvas Area - Takes remaining space */}
+            <div className="flex-1 mb-4">
+              <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 h-full">
+                <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-200">
+                  <h2 className="font-semibold text-gray-700 flex items-center gap-2">
+                    <i className="fas fa-paint-brush text-indigo-500"></i>
+                    Design Canvas
+                  </h2>
+                </div>
+                <div className="p-4 h-[calc(100%-68px)] flex items-center justify-center">
+                  <canvas 
+                    ref={canvasRef} 
+                    width="800" 
+                    height="600" 
+                    className="max-w-full max-h-full border border-gray-200"
+                  ></canvas>
+                </div>
               </div>
-            )}
-            <div className="mt-4">
-              <h5 className="text-lg font-medium">Recent Images</h5>
-              <div className="grid grid-cols-2 gap-2">
-                {recentImages.map((file) => (
-                  <div key={file.name} className="relative">
-                    <img
-                      src={file.data}
-                      alt={file.name}
-                      className="w-full h-20 object-cover rounded cursor-pointer"
-                      onClick={() => {
-                        fabric.Image.fromURL(file.data, (img) => {
-                          img.set({
-                            left: canvas?.width / 2,
-                            top: canvas?.height / 2,
-                            originX: 'center',
-                            originY: 'center',
-                            scaleX: 0.5,
-                            scaleY: 0.5,
-                            hasRotatingPoint: true,
-                            cornerSize: 12,
-                            transparentCorners: false,
-                            padding: 10,
-                            cornerColor: '#4a89dc',
-                            borderColor: '#4a89dc',
-                            name: 'custom-image',
-                            src: file.data,
-                          });
-                          canvas?.add(img);
-                          canvas?.setActiveObject(img);
-                          canvas?.renderAll();
-                        }, { crossOrigin: 'anonymous' });
-                      }}
-                    />
-                    <div className="text-xs truncate">{file.name.length > 15 ? file.name.substring(0, 12) + '...' : file.name}</div>
-                    <button
-                      onClick={() => deleteCachedImage(file.name)}
-                      className="absolute top-0 right-0 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center"
+            </div>
+
+            {/* Bottom Controls Panel */}
+            <div className="w-full bg-white rounded-xl shadow-lg border border-gray-200">
+              <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-200">
+                <h2 className="font-semibold text-gray-700 flex items-center gap-2">
+                  <i className="fas fa-sliders-h text-indigo-500"></i>
+                  Design Tools
+                </h2>
+              </div>
+
+              <div className="p-4 space-y-4">
+                {/* First Row - Product Type and Color */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Product Type Selector */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <i className="fas fa-tshirt text-indigo-500"></i>
+                      Product Type
+                    </label>
+                    <select
+                      value={productType}
+                      onChange={(e) => setProductType(e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white text-gray-700"
                     >
-                      ×
-                    </button>
+                      <option value="tshirt">T-Shirt</option>
+                      <option value="mug">Mug</option>
+                      <option value="bottle">Bottle</option>
+                    </select>
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="modal fade" id="emojiModal" tabIndex="-1" aria-labelledby="emojiModalLabel" aria-hidden="true">
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="emojiModalLabel">Select an Emoji</h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div className="modal-body">
-              <input
-                id="emojiSearch"
-                type="text"
-                placeholder="Search emojis..."
-                className="w-full p-2 border rounded mb-2"
-                onInput={(e) => {
-                  const searchTerm = e.target.value.toLowerCase();
-                  document.querySelectorAll('.emoji-option').forEach((emojiEl) => {
-                    const emojiName = emojiEl.querySelector('.emoji-name')?.textContent.toLowerCase();
-                    emojiEl.style.display = emojiName?.includes(searchTerm) ? 'block' : 'none';
-                  });
-                }}
-              />
-              <div className="grid grid-cols-4 gap-2">
-                {['😊', '👍', '❤️', '🎉'].map((emoji) => (
-                  <div
-                    key={emoji}
-                    className="emoji-option cursor-pointer p-2 hover:bg-gray-100"
-                    onClick={() => addEmoji(emoji)}
-                    data-emoji={emoji}
+                </div>
+
+                {/* Recent Images - Moved above Upload button */}
+                <div className="mt-2">
+                  <h3 className="font-medium text-gray-700 mb-2 flex items-center gap-2 text-sm">
+                    <i className="fas fa-history text-indigo-500"></i>
+                    Recent Images
+                  </h3>
+                  <div className="flex gap-2 overflow-x-auto pb-2">
+                    {recentImages.map((file) => (
+                      <div key={file.name} className="relative group flex-shrink-0">
+                        <div className="w-16 h-16 overflow-hidden rounded-lg border border-gray-200 bg-white">
+                          <img
+                            src={file.data}
+                            alt={file.name}
+                            className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                            onClick={() => {
+                              fabric.Image.fromURL(file.data, (img) => {
+                                img.set({
+                                  left: canvas?.width / 2,
+                                  top: canvas?.height / 2,
+                                  originX: 'center',
+                                  originY: 'center',
+                                  scaleX: 0.5,
+                                  scaleY: 0.5,
+                                  hasRotatingPoint: true,
+                                  cornerSize: 12,
+                                  transparentCorners: false,
+                                  padding: 10,
+                                  cornerColor: '#4a89dc',
+                                  borderColor: '#4a89dc',
+                                  name: 'custom-image',
+                                  src: file.data,
+                                });
+                                canvas?.add(img);
+                                canvas?.setActiveObject(img);
+                                canvas?.renderAll();
+                              }, { crossOrigin: 'anonymous' });
+                            }}
+                          />
+                        </div>
+                        <button
+                          onClick={() => deleteCachedImage(file.name)}
+                          className="absolute -top-1 -right-1 bg-red-500 text-white w-4 h-4 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-600 text-xs"
+                          title="Delete image"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Upload Image Button (only remaining action button) */}
+                <div className="grid grid-cols-1 gap-3">
+                  <button
+                    onClick={() => document.getElementById('fileUpload').click()}
+                    className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg transition-colors text-sm"
                   >
-                    <span className="text-2xl">{emoji}</span>
-                    <div className="emoji-name text-xs">{emoji}</div>
+                    <i className="fas fa-image"></i>
+                    Upload Image
+                  </button>
+                  <input
+                    id="fileUpload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleUpload}
+                    className="hidden"
+                  />
+                </div>
+
+                {/* Product Creation Form */}
+                <div className="mt-4 space-y-4">
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+                    <input 
+                      type="text" 
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
+                      placeholder="Enter product name" 
+                      required 
+                    />
                   </div>
-                ))}
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea 
+                      rows={3} 
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
+                      placeholder="Enter product description" 
+                      required 
+                    />
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
+                    <div className="relative">
+                      <input 
+                        type="number" 
+                        step="0.01" 
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
+                        placeholder="0.00" 
+                        required 
+                      />
+                      <span className="absolute right-3 top-2 text-gray-500">USD</span>
+                    </div>
+                  </div>
+
+                  {/* Variants Section */}
+                  <div className="mb-4">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Product Variants</h4>
+                    <div className="space-y-3">
+                      {/* Example variant - you would map through your variants in a real app */}
+                      <div className="border-b pb-3">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="font-medium">Size</span>
+                        </div>
+                        <div className="flex flex-wrap gap-3">
+                          {['S', 'M', 'L', 'XL'].map(size => (
+                            <label key={size} className="inline-flex items-center">
+                              <input 
+                                type="checkbox" 
+                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" 
+                              />
+                              <span className="ml-2 text-gray-700">{size}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="border-b pb-3">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="font-medium">Color</span>
+                        </div>
+                        <div className="flex flex-wrap gap-3">
+                          {['Red', 'Blue', 'Green', 'Black'].map(color => (
+                            <label key={color} className="inline-flex items-center">
+                              <input 
+                                type="checkbox" 
+                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" 
+                              />
+                              <span className="ml-2 text-gray-700">{color}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Hidden field for design data */}
+                  <input type="hidden" id="custom-design-data" />
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                    onClick={handleSubmit}
+                  >
+                    Create Product
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .canvas-delete-btn {
+          position: absolute;
+          width: 24px;
+          height: 24px;
+          background-color: white;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+          z-index: 1000;
+          color: #ef4444;
+          font-weight: bold;
+          transition: all 0.2s ease;
+        }
+        .canvas-delete-btn:hover {
+          transform: scale(1.1);
+          background-color: #fee2e2;
+        }
+        .print-area-warning {
+          position: absolute;
+          bottom: 10px;
+          left: 50%;
+          transform: translateX(-50%);
+          background-color: #ef4444;
+          color: white;
+          padding: 5px 10px;
+          border-radius: 4px;
+          font-size: 14px;
+          z-index: 1000;
+        }
+      `}
+      </style>
     </>
   );
 }
