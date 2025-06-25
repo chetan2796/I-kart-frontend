@@ -3,7 +3,7 @@ import Image from "next/image";
 const Card = ({ cardClickHandler, product }) => {
   return (
     <div
-      className="rounded-lg w-50 h-70 shadow-sm p-4 hover:shadow-md transition-shadow cursor-pointer bg-gray-100"
+      className="rounded-lg w-50 h-70 shadow-sm p-4 hover:shadow-lg transition-shadow cursor-pointer bg-gray-100"
       onClick={() => cardClickHandler(product)}
     >
       <div className="block">

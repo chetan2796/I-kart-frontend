@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { setSelectedProductList } from '../../lib/features/editProducts/editProductListSlice';
 
 export default function editProducts() {
   const canvasRef = useRef(null);
@@ -13,6 +14,7 @@ export default function editProducts() {
   const formRef = useRef(null);
   const [savedImage, setSavedImage] = useState(null);
   const product = useSelector((state) => state.product.selectedProduct);
+  const dispatch = useDispatch();
   console.log("product==>>", product)
 
   const printAreas = {
@@ -52,6 +54,95 @@ export default function editProducts() {
       strokeDashArray: [5, 5],
       zIndex: 99,
     },
+  };
+
+  const compressBase64Image = (base64, maxWidth = 800, quality = 0.7) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = base64;
+
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+
+        // Scale the image if it's too wide
+        if (width > maxWidth) {
+          height = (maxWidth / width) * height;
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Compress the image to JPEG with given quality
+        const compressedBase64 = canvas.toDataURL("image/jpeg", quality); // 0.0 (low) to 1.0 (high)
+        resolve(compressedBase64);
+      };
+
+      img.onerror = (err) => {
+        console.error("Image load error", err);
+        resolve(base64); // fallback
+      };
+    });
+  };
+
+  const saveProductHandler = async (dataURL) => {
+    console.log("product save==>>", product)
+    console.log("dataURL==>>", dataURL)
+    const compressed = await compressBase64Image(dataURL, 800, 0.6);
+    console.log("Compressed image:", compressed);
+    let modifiedProduct = {
+      "name": product.name,
+      "description": "string",
+      "name": product.name,
+      "priceCents": product.price,
+      "priceCurrency": "string",
+      "slug": "test-slug",
+      "catalogId": 1,
+      "productVariants": [
+        {
+          "optionName": "string",
+          "optionValues": [
+            "string"
+          ]
+        }
+      ]
+    }
+    try {
+      const response = await fetch("http://localhost:3000/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          modifiedProduct
+        ),
+      });
+
+      const data = await response.json();
+
+      debugger
+
+      // if (response.ok) {
+      //   alert("Otp sent successfully!");
+      //   localStorage.setItem("email", form.email);
+      //   localStorage.setItem("isLoggedIn", "true");
+
+      //   if (data.previewUrl) {
+      //     window.open(data.previewUrl, "_blank");
+      //   }
+      //   router.push("/user/verifyOtp");
+      // } else {
+      //   alert(data.message || "error occured. Try again.");
+      // }
+    } catch (error) {
+      console.error("login error:", error);
+      alert("Something went wrong. Please try again.");
+    }
   };
 
   // Load Fabric.js
@@ -410,6 +501,10 @@ export default function editProducts() {
       alert('Design saved')
       setupPrintArea(canvas, productType);
       setSavedImage(dataURL)
+      let modifiedProduct = [];
+      modifiedProduct.push(({ ...product, image: dataURL }))
+      saveProductHandler(dataURL)
+      dispatch(setSelectedProductList(dataURL))
     }, 100);
   };
 
