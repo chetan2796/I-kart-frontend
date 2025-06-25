@@ -4,7 +4,7 @@ import Head from 'next/head';
 import RequireAuth from '../components/RequireAuth';
 import { useSelector } from 'react-redux';
 
-export default function editProducts() {
+export default function EditProducts() {
   const canvasRef = useRef(null);
   const [canvas, setCanvas] = useState(null);
   const [fabric, setFabric] = useState(null);
@@ -487,7 +487,7 @@ export default function editProducts() {
               <div className="grid grid-cols-2 gap-2">
                 {recentImages.map((file) => (
                   <div key={file.name} className="relative">
-                    <img
+                    <Image
                       src={file.data}
                       alt={file.name}
                       className="w-full h-20 object-cover rounded cursor-pointer"

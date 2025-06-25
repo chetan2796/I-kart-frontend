@@ -2,8 +2,9 @@
 import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import { useSelector } from 'react-redux';
+import Image from 'next/image';
 
-export default function editProducts() {
+export default function EditProducts() {
   const canvasRef = useRef(null);
   const [canvas, setCanvas] = useState(null);
   const [fabric, setFabric] = useState(null);
@@ -508,7 +509,13 @@ export default function editProducts() {
             {savedImage && (
               <div style={{ marginTop: 20 }}>
                 <h2>Saved Image Preview:</h2>
-                <img src={savedImage} alt="Design Preview" style={{ maxWidth: '100%' }} />
+                <Image 
+                  src={savedImage} 
+                  alt="Design Preview" 
+                  width={800} 
+                  height={600}
+                  style={{ maxWidth: '100%', height: 'auto' }}
+                />
               </div>
             )}
             <div className="mt-4">
@@ -516,7 +523,7 @@ export default function editProducts() {
               <div className="grid grid-cols-2 gap-2">
                 {recentImages.map((file) => (
                   <div key={file.name} className="relative">
-                    <img
+                    <Image
                       src={file.data}
                       alt={file.name}
                       className="w-full h-20 object-cover rounded cursor-pointer"

@@ -482,7 +482,7 @@ export default function DesignEditor() {
               <div className="grid grid-cols-2 gap-2">
                 {recentImages.map((file) => (
                   <div key={file.name} className="relative">
-                    <img
+                    <Image
                       src={file.data}
                       alt={file.name}
                       className="w-full h-20 object-cover rounded cursor-pointer"
