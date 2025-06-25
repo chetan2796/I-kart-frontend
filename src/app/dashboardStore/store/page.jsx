@@ -1,6 +1,6 @@
 'use client';
 
-import RequireAuth from "@/app/components/RequireAuth";
+import RequireAuth from "../../components/RequireAuth";
 import Sidebar from "../../components/Sidebar";
 import Image from 'next/image';
 import Link from 'next/link';

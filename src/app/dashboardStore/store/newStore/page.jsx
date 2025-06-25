@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Sidebar from "../../../components/Sidebar";
-import RequireAuth from '../app/components/RequireAuth';
+import RequireAuth from '../../../components/RequireAuth';
 
 export default function AddStoreForm() {
   const [formData, setFormData] = useState({
