@@ -58,14 +58,6 @@ const Header = () => {
               </Link>
             </li>
             <li>
-              <Link
-                href="/profile_path"
-                className="btn btn-outline-primary btn-sm me-2 dropdown-item text-black"
-              >
-                Cart
-              </Link>
-            </li>
-            <li>
               <button
                 onClick={handleSignout}
                 className="btn btn-outline-primary btn-sm me-2 dropdown-item text-black"

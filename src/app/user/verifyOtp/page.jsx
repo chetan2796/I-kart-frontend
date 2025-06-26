@@ -7,20 +7,11 @@ import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ code: "" });
-
-  useEffect(() => {
-    const storedEmail = localStorage.getItem("email");
-    if (storedEmail) {
-      setForm((prev) => ({ ...prev, email: storedEmail }));
-    } else {
-      alert("No email found, please go back to login.");
-      router.push("/dashboardSeller");
-    }
-  }, []);
+  const [form, setForm] = useState({ code: "", email: "" });
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    const email = form.email || localStorage.getItem("email");
     try {
       const response = await fetch("http://localhost:3000/auth/otp/verify", {
         method: "POST",
@@ -29,6 +20,7 @@ export default function LoginPage() {
         },
         body: JSON.stringify({
           code: form.code,
+          email
         }),
       });
 

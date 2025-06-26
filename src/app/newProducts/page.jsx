@@ -24,7 +24,6 @@ const NewProducts = () => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        debugger
         const data = await response.json();
         setProducts(data);
       } catch (err) {

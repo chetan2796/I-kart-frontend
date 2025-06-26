@@ -15,6 +15,8 @@ const DashboardSeller = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -23,7 +25,6 @@ const DashboardSeller = () => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        debugger
         const data = await response.json();
         setProducts(data);
       } catch (err) {

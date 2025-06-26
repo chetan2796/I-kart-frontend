@@ -125,7 +125,6 @@ export default function editProducts() {
 
       const data = await response.json();
 
-      debugger
 
       // if (response.ok) {
       //   alert("Otp sent successfully!");

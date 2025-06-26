@@ -3,12 +3,12 @@ import Image from "next/image";
 const Card = ({ cardClickHandler, product }) => {
   return (
     <div
-      className="rounded-lg w-50 h-70 shadow-sm p-4 hover:shadow-lg transition-shadow cursor-pointer bg-gray-100"
+      className="rounded-md w-50 h-80 shadow-2xl p-4 hover:shadow-lg transition-shadow cursor-pointer bg-gray-100 mb-3.5"
       onClick={() => cardClickHandler(product)}
     >
       <div className="block">
         {/* Image container with fixed aspect ratio */}
-        <div className="relative h-40 mb-3 rounded-md overflow-hidden bg-gray-100">
+        <div className="relative h-40 mb-3 rounded-sm bg-gray-100">
           {product.image && (
             <Image
               src={product.image}
