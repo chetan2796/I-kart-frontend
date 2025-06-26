@@ -7,6 +7,8 @@ import { usePathname } from "next/navigation";
 import { useRef } from "react";
 import { Provider } from "react-redux";
 import { makeStore } from './lib/store'
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,7 +39,19 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {isLoginPage && <Header />}
-        <Provider store={storeRef.current}>{children}</Provider>
+        <Provider store={storeRef.current}>{children}
+          <ToastContainer
+            position="top-center"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
+        </Provider>
       </body>
     </html>
   );

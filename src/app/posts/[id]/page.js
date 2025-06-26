@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import { useSelector, useDispatch } from 'react-redux';
 import { setSelectedProductList } from '../../lib/features/editProducts/editProductListSlice';
+import { toast } from 'react-toastify';
 
 export default function editProducts() {
   const canvasRef = useRef(null);
@@ -140,7 +141,7 @@ export default function editProducts() {
       // }
     } catch (error) {
       console.error("login error:", error);
-      alert("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     }
   };
 

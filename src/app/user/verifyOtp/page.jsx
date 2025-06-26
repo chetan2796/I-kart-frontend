@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from 'react-toastify';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -11,6 +12,12 @@ export default function LoginPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    if (!form.code) {
+      toast.error('Otp is required');
+      return;
+    }
+
     const email = form.email || localStorage.getItem("email");
     try {
       const response = await fetch("http://localhost:3000/auth/otp/verify", {
@@ -27,14 +34,14 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
-        alert("login successful!");
+        toast.success("login successful!");
         router.push("/dashboardSeller");
       } else {
-        alert(data.message || "login failed. Try again.");
+        toast.error(data.message || "login failed. Try again.");
       }
     } catch (error) {
       console.error("login error:", error);
-      alert("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     }
   };
 
@@ -50,7 +57,7 @@ export default function LoginPage() {
                 OTP
               </label>
               <div className="relative">
-                <input type="text" name="code" placeholder="Enter OTP" required value={form.code} onChange={(e) => setForm({ code: e.target.value })
+                <input type="text" name="code" placeholder="Enter OTP"  value={form.code} onChange={(e) => setForm({ code: e.target.value })
                 } className="w-full px-4 py-2 pr-10 border border-blue-400 rounded-md focus:outline-none focus:ring-2 text-black focus:ring-blue-500" />
               </div>
             </div>

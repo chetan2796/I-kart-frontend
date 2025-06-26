@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from 'react-toastify';
+
 const Header = () => {
   const router = useRouter();
   const handleSignout = async () => {
     const email = localStorage.getItem("email");
 
     if (!email) {
-      alert("No user is logged in.");
+      toast.error("No user is logged in.");
       return;
     }
 
@@ -19,14 +21,14 @@ const Header = () => {
         body: JSON.stringify({ email }),
       });
       if (!response.ok) {
-        throw new Error("Failed to sign out");
+        throw new toast.error("Failed to sign out");
       }
       localStorage.removeItem("email");
       localStorage.removeItem("isLoggedIn");
       router.push("user/login");
     } catch (error) {
       console.error("Error during signout:", error);
-      alert("Signout failed. Please try again.");
+      toast.error("Signout failed. Please try again.");
     }
   };
 

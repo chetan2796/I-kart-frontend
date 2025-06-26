@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from 'react-toastify';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -11,6 +12,12 @@ export default function LoginPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    if (!form.email) {
+      toast.error('Email is required');
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:3000/auth/otp/generate", {
         method: "POST",
@@ -25,7 +32,7 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Otp sent successfully!");
+        toast.success("Otp sent successfully!");
         localStorage.setItem("email", form.email);
         localStorage.setItem("isLoggedIn", "true");
 
@@ -34,11 +41,11 @@ export default function LoginPage() {
       }
         router.push("/user/verifyOtp");
       } else {
-        alert(data.message || "error occured. Try again.");
+        toast.error(data.message || "error occured. Try again.");
       }
     } catch (error) {
       console.error("login error:", error);
-      alert("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     }
   };
 
@@ -54,7 +61,7 @@ export default function LoginPage() {
                 E-mail address
               </label>
               <div className="relative">
-                <input type="email" name="email" placeholder="example@email.com" required value={form.email} onChange={(e) => setForm({ email: e.target.value })
+                <input type="email" name="email" placeholder="example@email.com" value={form.email} onChange={(e) => setForm({ email: e.target.value })
                 } className="w-full px-4 py-2 pr-10 border border-blue-400 rounded-md focus:outline-none focus:ring-2 text-black focus:ring-blue-500" />
               </div>
             </div>
