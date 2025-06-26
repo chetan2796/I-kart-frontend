@@ -16,6 +16,7 @@ export default function editProducts() {
   const [savedImage, setSavedImage] = useState(null);
   const product = useSelector((state) => state.product.selectedProduct);
   const dispatch = useDispatch();
+  const [imageKitUrl,setImageKitUrl]=useState(null)
   console.log("product==>>", product)
 
   const printAreas = {
@@ -91,59 +92,70 @@ export default function editProducts() {
     });
   };
 
-  const saveProductHandler = async (dataURL) => {
-    console.log("product save==>>", product)
-    console.log("dataURL==>>", dataURL)
+  const handleSubmitcatalog = async (dataURL) => {
+  if (!product || !product.name) {
+    console.error('Product is missing:', product);
+    toast.error('Product data not available.');
+    return;
+  }
+
+  try {
     const compressed = await compressBase64Image(dataURL, 800, 0.6);
-    console.log("Compressed image:", compressed);
-    let modifiedProduct = {
-      "name": product.name,
-      "description": "string",
-      "name": product.name,
-      "priceCents": product.price,
-      "priceCurrency": "string",
-      "slug": "test-slug",
-      "catalogId": 1,
-      "productVariants": [
+
+    const blob = await (await fetch(compressed)).blob();
+    const file = new File([blob], `${product.name.replace(/\s+/g, '_')}.jpg`, {
+      type: 'image/jpeg',
+    });
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const uploadResponse = await fetch('http://localhost:3000/upload', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+         'Authorization': `Bearer ${token}`
+      },
+      body: formData,
+    });
+
+    const uploadData = await uploadResponse.json();
+    const imageKitUrl = uploadData.url;
+    console.log("imageKitUrl save handler==>>",imageKitUrl)
+
+    const modifiedProduct = {
+      name: product.name,
+      description: 'string',
+      priceCents: product.price,
+      priceCurrency: 'string',
+      slug: 'test-slug',
+      catalogId: 1,
+      image: imageKitUrl,
+      productVariants: [
         {
-          "optionName": "string",
-          "optionValues": [
-            "string"
-          ]
-        }
-      ]
-    }
-    try {
-      const response = await fetch("http://localhost:3000/products", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+          optionName: 'string',
+          optionValues: ['string'],
         },
-        body: JSON.stringify(
-          modifiedProduct
-        ),
-      });
+      ],
+    };
+    console.log("modifiedProduct==>>",modifiedProduct)
 
-      const data = await response.json();
+    const response = await fetch('http://localhost:3000/products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+         'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(modifiedProduct),
+    });
 
-
-      // if (response.ok) {
-      //   alert("Otp sent successfully!");
-      //   localStorage.setItem("email", form.email);
-      //   localStorage.setItem("isLoggedIn", "true");
-
-      //   if (data.previewUrl) {
-      //     window.open(data.previewUrl, "_blank");
-      //   }
-      //   router.push("/user/verifyOtp");
-      // } else {
-      //   alert(data.message || "error occured. Try again.");
-      // }
-    } catch (error) {
-      console.error("login error:", error);
-      toast.error("Something went wrong. Please try again.");
-    }
-  };
+    const data = await response.json();
+    console.log('Product saved:', data);
+  } catch (error) {
+    console.error('Upload or save error:', error);
+    toast.error('Something went wrong. Please try again.');
+  }
+};
 
   // Load Fabric.js
   useEffect(() => {
@@ -344,35 +356,41 @@ export default function editProducts() {
     if (modal) modal.hide();
   };
 
-  const handleUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (f) => {
-      cacheImage(file.name, file.type, file.size, f.target.result);
-      fabric.Image.fromURL(f.target.result, (img) => {
-        img.set({
-          left: canvas.width / 2,
-          top: canvas.height / 2,
-          originX: 'center',
-          originY: 'center',
-          scaleX: 0.5,
-          scaleY: 0.5,
-          hasRotatingPoint: true,
-          cornerSize: 12,
-          transparentCorners: false,
-          padding: 10,
-          cornerColor: '#4a89dc',
-          borderColor: '#4a89dc',
-          name: 'custom-image',
-        });
-        canvas.add(img);
-        canvas.setActiveObject(img);
-        canvas.renderAll();
-      }, { crossOrigin: 'anonymous' });
-    };
-    reader.readAsDataURL(file);
+  const handleUpload = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // Optional: show preview
+  const reader = new FileReader();
+  reader.onload = (f) => {
+    cacheImage(file.name, file.type, file.size, f.target.result);
   };
+  reader.readAsDataURL(file);
+
+  // Step 1: Upload file to ImageKit through backend
+  const formData = new FormData();
+  formData.append('image', file);
+
+  try {
+    const res = await fetch('http://localhost:3000/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = await res.json();
+    const imageKitUrl = data.url;
+    setImageKitUrl(imageKitUrl)
+
+    // Step 2: Store the imageKitUrl in state
+    setSavedImage(imageKitUrl); // You already have setSavedImage
+
+    console.log('ImageKit URL:', imageKitUrl);
+  } catch (err) {
+    console.error('Image upload failed:', err);
+    alert('Image upload failed. Please try again.');
+  }
+};
+
 
   const cacheImage = (name, type, size, dataURL) => {
     const updatedImages = [...recentImages];
@@ -503,7 +521,7 @@ export default function editProducts() {
       setSavedImage(dataURL)
       let modifiedProduct = [];
       modifiedProduct.push(({ ...product, image: dataURL }))
-      saveProductHandler(dataURL)
+      // saveProductHandler(dataURL)
       dispatch(setSelectedProductList(dataURL))
     }, 100);
   };
@@ -742,7 +760,7 @@ export default function editProducts() {
                   <button
                     type="submit"
                     className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-                    onClick={handleSubmit}
+                    onClick={handleSubmitcatalog}
                   >
                     Create Product
                   </button>
