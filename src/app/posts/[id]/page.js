@@ -91,59 +91,58 @@ export default function editProducts() {
     });
   };
 
-  const saveProductHandler = async (dataURL) => {
-    console.log("product save==>>", product)
-    console.log("dataURL==>>", dataURL)
-    const compressed = await compressBase64Image(dataURL, 800, 0.6);
-    console.log("Compressed image:", compressed);
-    let modifiedProduct = {
-      "name": product.name,
-      "description": "string",
-      "name": product.name,
-      "priceCents": product.price,
-      "priceCurrency": "string",
-      "slug": "test-slug",
-      "catalogId": 1,
-      "productVariants": [
+const saveProductHandler = async (dataURL) => {
+  try {
+    const blob = await (await fetch(dataURL)).blob();
+
+    const file = new File([blob], `${product.name.replace(/\s+/g, '_')}.png`, {
+      type: 'image/png',
+    });
+
+    // Upload to ImageKit
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const uploadResponse = await fetch('http://localhost:3000/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const imageKitData = await uploadResponse.json();
+    const imageUrl = imageKitData.url;
+
+    const modifiedProduct = {
+      name: product.name,
+      description: 'string',
+      priceCents: product.price,
+      priceCurrency: 'string',
+      slug: 'test-slug',
+      catalogId: 1,
+      image: imageUrl, 
+      productVariants: [
         {
-          "optionName": "string",
-          "optionValues": [
-            "string"
-          ]
-        }
-      ]
-    }
-    try {
-      const response = await fetch("http://localhost:3000/products", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+          optionName: 'string',
+          optionValues: ['string'],
         },
-        body: JSON.stringify(
-          modifiedProduct
-        ),
-      });
+      ],
+    };
 
-      const data = await response.json();
+    const response = await fetch('http://localhost:3000/products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(modifiedProduct),
+    });
 
+    const data = await response.json();
+    console.log('Saved to DB:', data);
+  } catch (error) {
+    console.error('Upload or Save Failed:', error);
+    alert('Something went wrong while saving your product.');
+  }
+};
 
-      // if (response.ok) {
-      //   alert("Otp sent successfully!");
-      //   localStorage.setItem("email", form.email);
-      //   localStorage.setItem("isLoggedIn", "true");
-
-      //   if (data.previewUrl) {
-      //     window.open(data.previewUrl, "_blank");
-      //   }
-      //   router.push("/user/verifyOtp");
-      // } else {
-      //   alert(data.message || "error occured. Try again.");
-      // }
-    } catch (error) {
-      console.error("login error:", error);
-      toast.error("Something went wrong. Please try again.");
-    }
-  };
 
   // Load Fabric.js
   useEffect(() => {
