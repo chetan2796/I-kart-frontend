@@ -108,6 +108,7 @@ export default function editProducts() {
     });
 
     const formData = new FormData();
+    const token = localStorage.getItem("token", data.token);
     formData.append('image', file);
 
     const uploadResponse = await fetch('http://localhost:3000/upload', {
@@ -138,8 +139,7 @@ export default function editProducts() {
         },
       ],
     };
-    console.log("modifiedProduct==>>",modifiedProduct)
-
+    console.log("modifiedProduct==>>",modifiedProduct);
     const response = await fetch('http://localhost:3000/products', {
       method: 'POST',
       headers: {

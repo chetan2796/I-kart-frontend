@@ -24,6 +24,7 @@ const Header = () => {
         throw new toast.error("Failed to sign out");
       }
       localStorage.removeItem("email");
+      localStorage.removeItem("token");
       localStorage.removeItem("isLoggedIn");
       router.push("user/login");
     } catch (error) {
