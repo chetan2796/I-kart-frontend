@@ -51,6 +51,8 @@ export default function editProducts() {
     });
   };
 
+
+
 const handleSubmitForm = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -105,7 +107,7 @@ const handleSubmitForm = async (e) => {
       const formData = new FormData();
       const token = localStorage.getItem("token");
       formData.append('image', file);
-
+      debugger
       const uploadResponse = await fetch('http://localhost:3000/upload', {
         method: 'POST',
         headers: {
@@ -113,21 +115,24 @@ const handleSubmitForm = async (e) => {
         },
         body: formData,
       });
-      debugger
 
       const uploadData = await uploadResponse.json();
       const imageKitUrl = uploadData.url;
 
       // Prepare the product payload with images as array
-      debugger
       const payload = {
-        name: form.name,
-        description: form.description,
+        name: product.name,
+        description: product.description,
         priceCents: parseFloat(form.price) * 100, // Convert to cents if needed
         priceCurrency: "USD",
-        slug: form.name.toLowerCase().replace(/\s+/g, '-'),
+        slug: product.name.toLowerCase().replace(/\s+/g, '-'),
         catalogId: product["categoryId"],
-        productImages: [{url: "https://ik.imagekit.io/autpna2fh/Screenshot%20from%202025-06-24%2013-13-21.png?updatedAt=1750768401787", altText: 'fgg'}], // Now sending as array
+        productImages: [
+          {
+            url: imageKitUrl, 
+            altText: form.name || 'customized product',
+          }
+        ],
         productVariants: [
           {
             optionName: "size",
@@ -145,7 +150,7 @@ const handleSubmitForm = async (e) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
@@ -466,7 +471,6 @@ const handleSubmitForm = async (e) => {
         body: formData,
       });
 
-      debugger
 
       const data = await res.json();
       const imageKitUrl = data.url;
