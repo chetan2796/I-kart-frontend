@@ -119,14 +119,15 @@ const handleSubmitForm = async (e) => {
       const imageKitUrl = uploadData.url;
 
       // Prepare the product payload with images as array
+      debugger
       const payload = {
         name: form.name,
         description: form.description,
         priceCents: parseFloat(form.price) * 100, // Convert to cents if needed
         priceCurrency: "USD",
         slug: form.name.toLowerCase().replace(/\s+/g, '-'),
-        catalogId: 1,
-        productImages: [{url: imageKitUrl, altText: 'fgg'}], // Now sending as array
+        catalogId: product["categoryId"],
+        productImages: [{url: "https://ik.imagekit.io/autpna2fh/Screenshot%20from%202025-06-24%2013-13-21.png?updatedAt=1750768401787", altText: 'fgg'}], // Now sending as array
         productVariants: [
           {
             optionName: "size",
