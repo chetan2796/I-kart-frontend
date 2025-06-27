@@ -573,14 +573,14 @@ export default function editProducts() {
     console.log("saved iamge==>>", savedImage)
     const compressedImage = await compressBase64Image(dataURL, 800, 0.6);
     console.log("CompressedImage image:", compressedImage);
+
     let modifiedProduct = {
       "name": productData.name,
-      "description": "string",
-      "name": productData.name,
-      "priceCents": 556,
-      "priceCurrency": "string",
-      "slug": "test-slug",
-      "catalogId": 1,
+      "description": payload.description,
+      "priceCents": payload.price || 100,
+      "priceCurrency": "USD",
+      "slug": generateRandomSlug(productData.name),
+      "catalogId": printArea.catalogId || 1,
       "productVariants": [
         {
           "optionName": "string",
@@ -624,6 +624,11 @@ export default function editProducts() {
     }
   };
 
+  const generateRandomSlug = () => {
+    const randomString = Math.random().toString(36).substring(2, 8); // 6 random chars
+    const randomNumber = Math.floor(Math.random() * 1000); // Random number (0-999)
+    return `product-${randomString}-${randomNumber}`;
+  };
   const deleteCachedImage = (fileName) => {
     if (confirm(`Are you sure you want to delete ${fileName}?`)) {
       const updatedImages = recentImages.filter((img) => img.name !== fileName);
@@ -685,26 +690,6 @@ export default function editProducts() {
               </div>
 
               <div className="p-4 space-y-4">
-                {/* First Row - Product Type and Color */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Product Type Selector */}
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
-                      <i className="fas fa-tshirt text-indigo-500"></i>
-                      Product Type
-                    </label>
-                    <select
-                      value={productType}
-                      onChange={(e) => setProductType(e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white text-gray-700"
-                    >
-                      <option value="tshirt">T-Shirt</option>
-                      <option value="mug">Mug</option>
-                      <option value="bottle">Bottle</option>
-                    </select>
-                  </div>
-                </div>
-
                 {/* Recent Images - Moved above Upload button */}
                 <div className="mt-2">
                   <h3 className="font-medium text-gray-700 mb-2 flex items-center gap-2 text-sm">
