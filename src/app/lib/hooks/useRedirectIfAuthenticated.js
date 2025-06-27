@@ -10,7 +10,6 @@ export const useRedirectIfAuthenticated = (redirectTo = '/dashboardSeller') => {
     if (token) {
       router.replace(redirectTo);
     } else {
-      router.replace('/user/login');
       setChecking(false);
     }
   }, []);

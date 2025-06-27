@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 const Header = () => {
   const router = useRouter();
@@ -35,6 +35,40 @@ const Header = () => {
 
   return (
     <header className="header">
+      <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm flex p-5">
+        <div className="container">
+          <Link
+            href="/dashboardSeller"
+            className="btn btn-outline-primary btn-sm me-2 navbar-bra nd fw-bold text-black"
+          >
+            i-kart
+          </Link>
+        </div>
+        -
+        <div className="d-flex align-items-center ms-auto">
+          <ul
+            className="dropdown-menu dropdown-menu-end flex"
+            aria-labelledby="userDropdown"
+          >
+            <li>
+              <Link
+                href="/profile_path"
+                className="btn btn-outline-primary btn-sm me-2 dropdown-item text-black"
+              >
+                Profile
+              </Link>
+            </li>
+            <li>
+              <button
+                onClick={handleSignout}
+                className="btn btn-outline-primary btn-sm me-2 dropdown-item text-black"
+              >
+                Sign Out
+              </button>
+            </li>
+          </ul>
+        </div>
+      </nav>
     </header>
   );
 };
