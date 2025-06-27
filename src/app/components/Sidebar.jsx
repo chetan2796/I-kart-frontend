@@ -9,7 +9,7 @@ export default function Sidebar() {
       <ul className="space-y-4">
         <li className='hover:bg-gray-200 p-2 cursor-pointer'><Link href="/dashboardSeller">Dashboard</Link></li>
         <li className='hover:bg-gray-200 p-2 cursor-pointer'><Link href="/newProducts">Catalogs</Link></li>
-        <li className='hover:bg-gray-200 p-2 cursor-pointer'><Link href="/dashboardStore/store">My Stores</Link></li>
+        <li className='hover:bg-gray-200 p-2 cursor-pointer'><Link href="/dashboardStore/store">Stores</Link></li>
       </ul>
     </div>
   );

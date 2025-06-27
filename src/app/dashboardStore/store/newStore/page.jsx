@@ -4,11 +4,13 @@ import { useState } from 'react';
 import Sidebar from "../../../components/Sidebar";
 import RequireAuth from '../../../components/RequireAuth';
 
+
 export default function AddStoreForm() {
   const [formData, setFormData] = useState({
     name: '',
     logo: null,
     banner: null,
+    slug: `store-${crypto.randomUUID()}`
   });
 
   const handleChange = (e) => {
@@ -19,9 +21,34 @@ export default function AddStoreForm() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+
+    const data = new FormData();
+    data.append('name', formData.name);
+    data.append('slug', formData.slug);
+    if (formData.logo) data.append('logo', formData.logo);
+    if (formData.banner) data.append('banner', formData.banner);
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:3000/stores', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: data,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Store created successfully:', result);
+    } catch (error) {
+      console.error('Failed to create store:', error);
+    }
   };
 
   return (
