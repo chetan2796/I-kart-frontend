@@ -5,10 +5,14 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from 'react-toastify';
+import { useRedirectIfAuthenticated } from '../../lib/hooks/useRedirectIfAuthenticated';
 
 export default function LoginPage() {
   const router = useRouter();
   const [form, setForm] = useState({ code: "", email: "" });
+
+  const checking = useRedirectIfAuthenticated();
+  if (checking) return null;
 
   const handleLogin = async (e) => {
     e.preventDefault();
