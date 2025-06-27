@@ -16,8 +16,8 @@ export default function editProducts() {
   const [savedImage, setSavedImage] = useState(null);
   const product = useSelector((state) => state.product.selectedProduct);
   const dispatch = useDispatch();
-  const [imageKitUrl, setImageKitUrl] = useState(null)
-  console.log("product==>>", product)
+  const [imageKitUrl, setImageKitUrl] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -27,7 +27,7 @@ export default function editProducts() {
       size: [],
       color: [],
     },
-    designData: "", // for hidden input, if you need to add data programmatically
+    designData: "",
   });
 
   const handleInputChange = (e) => {
@@ -51,68 +51,130 @@ export default function editProducts() {
     });
   };
 
-  const handleSubmitForm = async (e) => {
+const handleSubmitForm = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    const payload = {
-      name: form.name,
-      description: form.description,
-      price: parseFloat(form.price),
-      variants: form.variants,
-      designData: form.designData,
-    };
-
-    console.log("payload==>>", payload)
-
-    console.log("dataURL==>>", savedImage)
-    const compressed = await compressBase64Image(savedImage, 800, 0.6);
-    console.log("Compressed image:", compressed);
-    let modifiedProduct = {
-      "name": product.name,
-      "description": "string",
-      "name": product.name,
-      "priceCents": product.price,
-      "priceCurrency": "string",
-      "slug": "test-slug",
-      "catalogId": 1,
-      "productVariants": [
-        {
-          "optionName": "string",
-          "optionValues": [
-            "string"
-          ]
-        }
-      ]
-    }
     try {
+      // First, save the canvas design as an image
+      if (!canvas) {
+        toast.error('Canvas not initialized');
+        return;
+      }
+
+      const customObjects = canvas.getObjects().filter((obj) =>
+        obj.name && obj.name.includes('custom')
+      );
+      
+      if (customObjects.length === 0) {
+        toast.error('Please add at least one customization (text or image) before saving!');
+        return;
+      }
+      
+      if (!validateDesignPosition(canvas)) {
+        toast.error('Some design elements are outside the printable area. Please adjust them before saving.');
+        return;
+      }
+
+      const printArea = canvas.getObjects().find((obj) => obj.name === 'print-area');
+      if (printArea) {
+        printArea.set({ stroke: 'transparent', fill: 'transparent' });
+        canvas.renderAll();
+      }
+
+      const dataURL = await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(canvas.toDataURL({ format: 'png', quality: 1.0 }));
+        }, 100);
+      });
+
+      // Reset print area border
+      if (printArea) {
+        setupPrintArea(canvas, productType);
+      }
+
+      // Compress the image
+      const compressed = await compressBase64Image(dataURL, 800, 0.6);
+
+      // Upload the image to your server/ImageKit
+      const blob = await (await fetch(compressed)).blob();
+      const file = new File([blob], `${form.name.replace(/\s+/g, '_')}.jpg`, {
+        type: 'image/jpeg',
+      });
+
+      const formData = new FormData();
+      const token = localStorage.getItem("token");
+      formData.append('image', file);
+
+      const uploadResponse = await fetch('http://localhost:3000/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData,
+      });
+      debugger
+
+      const uploadData = await uploadResponse.json();
+      const imageKitUrl = uploadData.url;
+
+      // Prepare the product payload with images as array
+      const payload = {
+        name: form.name,
+        description: form.description,
+        priceCents: parseFloat(form.price) * 100, // Convert to cents if needed
+        priceCurrency: "USD",
+        slug: form.name.toLowerCase().replace(/\s+/g, '-'),
+        catalogId: 1,
+        productImages: [{url: imageKitUrl, altText: 'fgg'}], // Now sending as array
+        productVariants: [
+          {
+            optionName: "size",
+            optionValues: form.variants.size,
+          },
+          {
+            optionName: "color",
+            optionValues: form.variants.color,
+          },
+        ],
+      };
+
+      // Submit the product data
       const response = await fetch("http://localhost:3000/products", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify(
-          modifiedProduct
-        ),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
 
-
       if (response.ok) {
-        alert("Otp sent successfully!");
-        localStorage.setItem("email", form.email);
-        localStorage.setItem("isLoggedIn", "true");
-
-        if (data.previewUrl) {
-          window.open(data.previewUrl, "_blank");
-        }
-        router.push("/user/verifyOtp");
+        toast.success("Product created successfully!");
+        // Reset form if needed
+        setForm({
+          name: "",
+          description: "",
+          price: "",
+          variants: {
+            size: [],
+            color: [],
+          },
+          designData: "",
+        });
+        // Clear canvas
+        canvas.clear();
+        loadBaseProductImage(canvas);
       } else {
-        alert(data.message || "error occured. Try again.");
+        throw new Error(data.message || "Error creating product");
       }
     } catch (error) {
-      console.error("login error:", error);
-      alert("Something went wrong. Please try again.");
+      console.error("Submission error:", error);
+      toast.error(error.message || "Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -165,7 +227,6 @@ export default function editProducts() {
         let width = img.width;
         let height = img.height;
 
-        // Scale the image if it's too wide
         if (width > maxWidth) {
           height = (maxWidth / width) * height;
           width = maxWidth;
@@ -177,81 +238,15 @@ export default function editProducts() {
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Compress the image to JPEG with given quality
-        const compressedBase64 = canvas.toDataURL("image/jpeg", quality); // 0.0 (low) to 1.0 (high)
+        const compressedBase64 = canvas.toDataURL("image/jpeg", quality);
         resolve(compressedBase64);
       };
 
       img.onerror = (err) => {
         console.error("Image load error", err);
-        resolve(base64); // fallback
+        resolve(base64);
       };
     });
-  };
-
-  const handleSubmitcatalog = async (dataURL) => {
-    if (!product || !product.name) {
-      console.error('Product is missing:', product);
-      toast.error('Product data not available.');
-      return;
-    }
-
-    try {
-      const compressed = await compressBase64Image(dataURL, 800, 0.6);
-
-      const blob = await (await fetch(compressed)).blob();
-      const file = new File([blob], `${product.name.replace(/\s+/g, '_')}.jpg`, {
-        type: 'image/jpeg',
-      });
-
-      const formData = new FormData();
-      const token = localStorage.getItem("token", data.token);
-      formData.append('image', file);
-
-      const uploadResponse = await fetch('http://localhost:3000/upload', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData,
-      });
-
-      const uploadData = await uploadResponse.json();
-      const imageKitUrl = uploadData.url;
-      console.log("imageKitUrl save handler==>>", imageKitUrl)
-
-      const modifiedProduct = {
-        name: product.name,
-        description: 'string',
-        priceCents: product.price,
-        priceCurrency: 'string',
-        slug: 'test-slug',
-        catalogId: 1,
-        image: imageKitUrl,
-        productVariants: [
-          {
-            optionName: 'string',
-            optionValues: ['string'],
-          },
-        ],
-      };
-      console.log("modifiedProduct==>>", modifiedProduct);
-      const response = await fetch('http://localhost:3000/products', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(modifiedProduct),
-      });
-
-      const data = await response.json();
-      console.log('Product saved:', data);
-    } catch (error) {
-      console.error('Upload or save error:', error);
-      toast.error('Something went wrong. Please try again.');
-    }
   };
 
   // Load Fabric.js
@@ -301,8 +296,7 @@ export default function editProducts() {
   };
 
   const loadBaseProductImage = (canvasInstance) => {
-    // Using a placeholder image; replace with your carousel logic if needed
-    const imageSrc = product?.catalogImages?.[0]?.url; // Adjust path as needed
+    const imageSrc = product?.catalogImages?.[0]?.url;
     fabric.Image.fromURL(imageSrc, (img) => {
       img.scaleToWidth(canvasInstance.width * 0.9);
       img.set({
@@ -448,7 +442,6 @@ export default function editProducts() {
     canvas.add(text);
     canvas.setActiveObject(text);
     canvas.renderAll();
-    // Close modal (assuming Bootstrap is handling it)
     const modal = window.bootstrap.Modal.getInstance(document.getElementById('emojiModal'));
     if (modal) modal.hide();
   };
@@ -457,14 +450,12 @@ export default function editProducts() {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Optional: show preview
     const reader = new FileReader();
     reader.onload = (f) => {
       cacheImage(file.name, file.type, file.size, f.target.result);
     };
     reader.readAsDataURL(file);
 
-    // Step 1: Upload file to ImageKit through backend
     const formData = new FormData();
     formData.append('image', file);
 
@@ -474,20 +465,17 @@ export default function editProducts() {
         body: formData,
       });
 
+      debugger
+
       const data = await res.json();
       const imageKitUrl = data.url;
-      setImageKitUrl(imageKitUrl)
-
-      // Step 2: Store the imageKitUrl in state
-      setSavedImage(imageKitUrl); // You already have setSavedImage
-
-      console.log('ImageKit URL:', imageKitUrl);
+      setImageKitUrl(imageKitUrl);
+      setSavedImage(imageKitUrl);
     } catch (err) {
       console.error('Image upload failed:', err);
-      alert('Image upload failed. Please try again.');
+      toast.error('Image upload failed. Please try again.');
     }
   };
-
 
   const cacheImage = (name, type, size, dataURL) => {
     const updatedImages = [...recentImages];
@@ -540,34 +528,6 @@ export default function editProducts() {
     }
   };
 
-  // const validateDesignPosition = (canvasInstance) => {
-  //   const printArea = canvasInstance.getObjects().find((obj) => obj.name === 'print-area');
-  //   if (!printArea) return true;
-  //   const customObjects = canvasInstance.getObjects().filter((obj) =>
-  //     obj.name && obj.name.includes('custom')
-  //   );
-  //   return customObjects.every((obj) => {
-  //     const objBounds = {
-  //       left: obj.left - (obj.width * obj.scaleX) / 2,
-  //       right: obj.left + (obj.width * obj.scaleX) / 2,
-  //       top: obj.top - (obj.height * obj.scaleY) / 2,
-  //       bottom: obj.top + (obj.height * obj.scaleY) / 2,
-  //     };
-  //     const areaBounds = {
-  //       left: printArea.left - printArea.width / 2,
-  //       right: printArea.left + printArea.width / 2,
-  //       top: printArea.top - printArea.height / 2,
-  //       bottom: printArea.top + printArea.height / 2,
-  //     };
-  //     return (
-  //       objBounds.right <= areaBounds.right &&
-  //       objBounds.left >= areaBounds.left &&
-  //       objBounds.bottom <= areaBounds.bottom &&
-  //       objBounds.top >= areaBounds.top
-  //     );
-  //   });
-  // };
-
   const validateDesignPosition = (canvasInstance) => {
     const printArea = canvasInstance.getObjects().find((obj) => obj.name === 'print-area');
     if (!printArea) return true;
@@ -587,40 +547,6 @@ export default function editProducts() {
         objBounds.top + objBounds.height <= areaBounds.top + areaBounds.height
       );
     });
-  };
-
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!canvas) return;
-    const customObjects = canvas.getObjects().filter((obj) =>
-      obj.name && obj.name.includes('custom')
-    );
-    if (customObjects.length === 0) {
-      alert('Please add at least one customization (text or image) before saving!');
-      return;
-    }
-    if (!validateDesignPosition(canvas)) {
-      alert('Some design elements are outside the printable area. Please adjust them before saving.');
-      return;
-    }
-    const printArea = canvas.getObjects().find((obj) => obj.name === 'print-area');
-    if (printArea) {
-      printArea.set({ stroke: 'transparent', fill: 'transparent' });
-      canvas.renderAll();
-    }
-    setTimeout(() => {
-      const dataURL = canvas.toDataURL({ format: 'png', quality: 1.0 });
-      console.log('Design saved:', dataURL); // Replace with actual form submission
-      // Optionally, reset the print area border
-      alert('Design saved')
-      setupPrintArea(canvas, productType);
-      setSavedImage(dataURL)
-      let modifiedProduct = [];
-      modifiedProduct.push(({ ...product, image: dataURL }))
-      // saveProductHandler(dataURL)
-      dispatch(setSelectedProductList(dataURL))
-    }, 100);
   };
 
   const deleteCachedImage = (fileName) => {
@@ -704,7 +630,7 @@ export default function editProducts() {
                   </div>
                 </div>
 
-                {/* Recent Images - Moved above Upload button */}
+                {/* Recent Images */}
                 <div className="mt-2">
                   <h3 className="font-medium text-gray-700 mb-2 flex items-center gap-2 text-sm">
                     <i className="fas fa-history text-indigo-500"></i>
@@ -755,7 +681,7 @@ export default function editProducts() {
                   </div>
                 </div>
 
-                {/* Upload Image Button (only remaining action button) */}
+                {/* Upload Image Button */}
                 <div className="grid grid-cols-1 gap-3">
                   <button
                     onClick={() => document.getElementById('fileUpload').click()}
@@ -871,26 +797,16 @@ export default function editProducts() {
                       </div>
                     </div>
 
-                    {/* Hidden field for design data */}
-                    <input
-                      type="hidden"
-                      id="custom-design-data"
-                      value={form.designData}
-                      onChange={(e) =>
-                        setForm((prev) => ({ ...prev, designData: e.target.value }))
-                      }
-                    />
-
                     {/* Submit Button */}
                     <button
                       type="submit"
-                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                      disabled={isSubmitting}
+                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Create Product
+                      {isSubmitting ? 'Creating Product...' : 'Create Product'}
                     </button>
                   </div>
                 </form>
-
               </div>
             </div>
           </div>
@@ -930,8 +846,7 @@ export default function editProducts() {
           font-size: 14px;
           z-index: 1000;
         }
-      `}
-      </style>
+      `}</style>
     </>
   );
 }
