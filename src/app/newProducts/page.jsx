@@ -39,6 +39,7 @@ const NewProducts = () => {
   }, []);
 
   const editProductHandler = (product) => {
+    localStorage.setItem("productInfo", JSON.stringify(product));
     router.push(`posts/${product.id}`);
     dispatch(setSelectedProduct(product));
   };

@@ -17,7 +17,9 @@ export default function editProducts() {
   const product = useSelector((state) => state.product.selectedProduct);
   const dispatch = useDispatch();
   const [imageKitUrl, setImageKitUrl] = useState(null)
+  const [productData, setProductData] = useState(localStorage.getItem("productInfo") ? JSON.parse(localStorage.getItem("productInfo")) : null);
   console.log("product==>>", product)
+  const [authToken, setAuthToken] = useState(null)
 
   const [form, setForm] = useState({
     name: "",
@@ -51,70 +53,75 @@ export default function editProducts() {
     });
   };
 
-  const handleSubmitForm = async (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    const authToken = localStorage.getItem('token')
+    setAuthToken(authToken)
+  }, [])
 
-    const payload = {
-      name: form.name,
-      description: form.description,
-      price: parseFloat(form.price),
-      variants: form.variants,
-      designData: form.designData,
-    };
+  // const handleSubmitForm = async (e) => {
+  //   e.preventDefault();
 
-    console.log("payload==>>", payload)
+  //   const payload = {
+  //     name: form.name,
+  //     description: form.description,
+  //     price: parseFloat(form.price),
+  //     variants: form.variants,
+  //     designData: form.designData,
+  //   };
 
-    console.log("dataURL==>>", savedImage)
-    const compressed = await compressBase64Image(savedImage, 800, 0.6);
-    console.log("Compressed image:", compressed);
-    let modifiedProduct = {
-      "name": product.name,
-      "description": "string",
-      "name": product.name,
-      "priceCents": product.price,
-      "priceCurrency": "string",
-      "slug": "test-slug",
-      "catalogId": 1,
-      "productVariants": [
-        {
-          "optionName": "string",
-          "optionValues": [
-            "string"
-          ]
-        }
-      ]
-    }
-    try {
-      const response = await fetch("http://localhost:3000/products", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(
-          modifiedProduct
-        ),
-      });
+  //   console.log("payload==>>", payload)
 
-      const data = await response.json();
+  //   console.log("dataURL==>>", savedImage)
+  //   const compressed = await compressBase64Image(savedImage, 800, 0.6);
+  //   console.log("Compressed image:", compressed);
+  //   let modifiedProduct = {
+  //     "name": product.name,
+  //     "description": "string",
+  //     "name": product.name,
+  //     "priceCents": product.price,
+  //     "priceCurrency": "string",
+  //     "slug": "test-slug",
+  //     "catalogId": 1,
+  //     "productVariants": [
+  //       {
+  //         "optionName": "string",
+  //         "optionValues": [
+  //           "string"
+  //         ]
+  //       }
+  //     ]
+  //   }
+  //   try {
+  //     const response = await fetch("http://localhost:3000/products", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(
+  //         modifiedProduct
+  //       ),
+  //     });
+
+  //     const data = await response.json();
 
 
-      if (response.ok) {
-        alert("Otp sent successfully!");
-        localStorage.setItem("email", form.email);
-        localStorage.setItem("isLoggedIn", "true");
+  //     if (response.ok) {
+  //       alert("Otp sent successfully!");
+  //       localStorage.setItem("email", form.email);
+  //       localStorage.setItem("isLoggedIn", "true");
 
-        if (data.previewUrl) {
-          window.open(data.previewUrl, "_blank");
-        }
-        router.push("/user/verifyOtp");
-      } else {
-        alert(data.message || "error occured. Try again.");
-      }
-    } catch (error) {
-      console.error("login error:", error);
-      alert("Something went wrong. Please try again.");
-    }
-  };
+  //       if (data.previewUrl) {
+  //         window.open(data.previewUrl, "_blank");
+  //       }
+  //       router.push("/user/verifyOtp");
+  //     } else {
+  //       alert(data.message || "error occured. Try again.");
+  //     }
+  //   } catch (error) {
+  //     console.error("login error:", error);
+  //     alert("Something went wrong. Please try again.");
+  //   }
+  // };
 
   const printAreas = {
     tshirt: {
@@ -189,70 +196,6 @@ export default function editProducts() {
     });
   };
 
-  const handleSubmitcatalog = async (dataURL) => {
-    if (!product || !product.name) {
-      console.error('Product is missing:', product);
-      toast.error('Product data not available.');
-      return;
-    }
-
-    try {
-      const compressed = await compressBase64Image(dataURL, 800, 0.6);
-
-      const blob = await (await fetch(compressed)).blob();
-      const file = new File([blob], `${product.name.replace(/\s+/g, '_')}.jpg`, {
-        type: 'image/jpeg',
-      });
-
-      const formData = new FormData();
-      const token = localStorage.getItem("token", data.token);
-      formData.append('image', file);
-
-      const uploadResponse = await fetch('http://localhost:3000/upload', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData,
-      });
-
-      const uploadData = await uploadResponse.json();
-      const imageKitUrl = uploadData.url;
-      console.log("imageKitUrl save handler==>>", imageKitUrl)
-
-      const modifiedProduct = {
-        name: product.name,
-        description: 'string',
-        priceCents: product.price,
-        priceCurrency: 'string',
-        slug: 'test-slug',
-        catalogId: 1,
-        image: imageKitUrl,
-        productVariants: [
-          {
-            optionName: 'string',
-            optionValues: ['string'],
-          },
-        ],
-      };
-      console.log("modifiedProduct==>>", modifiedProduct);
-      const response = await fetch('http://localhost:3000/products', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(modifiedProduct),
-      });
-
-      const data = await response.json();
-      console.log('Product saved:', data);
-    } catch (error) {
-      console.error('Upload or save error:', error);
-      toast.error('Something went wrong. Please try again.');
-    }
-  };
 
   // Load Fabric.js
   useEffect(() => {
@@ -453,39 +396,34 @@ export default function editProducts() {
     if (modal) modal.hide();
   };
 
-  const handleUpload = async (e) => {
+  const handleUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
-    // Optional: show preview
     const reader = new FileReader();
     reader.onload = (f) => {
       cacheImage(file.name, file.type, file.size, f.target.result);
+      fabric.Image.fromURL(f.target.result, (img) => {
+        img.set({
+          left: canvas.width / 2,
+          top: canvas.height / 2,
+          originX: 'center',
+          originY: 'center',
+          scaleX: 0.5,
+          scaleY: 0.5,
+          hasRotatingPoint: true,
+          cornerSize: 12,
+          transparentCorners: false,
+          padding: 10,
+          cornerColor: '#4a89dc',
+          borderColor: '#4a89dc',
+          name: 'custom-image',
+        });
+        canvas.add(img);
+        canvas.setActiveObject(img);
+        canvas.renderAll();
+      }, { crossOrigin: 'anonymous' });
     };
     reader.readAsDataURL(file);
-
-    // Step 1: Upload file to ImageKit through backend
-    const formData = new FormData();
-    formData.append('image', file);
-
-    try {
-      const res = await fetch('http://localhost:3000/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await res.json();
-      const imageKitUrl = data.url;
-      setImageKitUrl(imageKitUrl)
-
-      // Step 2: Store the imageKitUrl in state
-      setSavedImage(imageKitUrl); // You already have setSavedImage
-
-      console.log('ImageKit URL:', imageKitUrl);
-    } catch (err) {
-      console.error('Image upload failed:', err);
-      alert('Image upload failed. Please try again.');
-    }
   };
 
 
@@ -590,7 +528,7 @@ export default function editProducts() {
   };
 
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!canvas) return;
     const customObjects = canvas.getObjects().filter((obj) =>
@@ -609,18 +547,81 @@ export default function editProducts() {
       printArea.set({ stroke: 'transparent', fill: 'transparent' });
       canvas.renderAll();
     }
-    setTimeout(() => {
-      const dataURL = canvas.toDataURL({ format: 'png', quality: 1.0 });
-      console.log('Design saved:', dataURL); // Replace with actual form submission
-      // Optionally, reset the print area border
-      alert('Design saved')
-      setupPrintArea(canvas, productType);
-      setSavedImage(dataURL)
-      let modifiedProduct = [];
-      modifiedProduct.push(({ ...product, image: dataURL }))
-      // saveProductHandler(dataURL)
-      dispatch(setSelectedProductList(dataURL))
-    }, 100);
+    let dataURL;
+    dataURL = canvas.toDataURL({ format: 'png', quality: 1.0 });
+    console.log('Design saved:', dataURL); // Replace with actual form submission
+    // Optionally, reset the print area border
+    alert('Design saved')
+    setupPrintArea(canvas, productType);
+    setSavedImage(dataURL)
+    // let modifiedProduct = [];
+    // modifiedProduct.push(({ ...product, image: dataURL }))
+    // saveProductHandler(dataURL)
+    dispatch(setSelectedProductList(dataURL))
+
+
+
+    const payload = {
+      name: form.name,
+      description: form.description,
+      price: parseFloat(form.price),
+      variants: form.variants,
+      designData: form.designData,
+    };
+    console.log("payload==>>", payload)
+    console.log("dataURL==>>", dataURL)
+    console.log("saved iamge==>>", savedImage)
+    const compressedImage = await compressBase64Image(dataURL, 800, 0.6);
+    console.log("CompressedImage image:", compressedImage);
+    let modifiedProduct = {
+      "name": productData.name,
+      "description": "string",
+      "name": productData.name,
+      "priceCents": 556,
+      "priceCurrency": "string",
+      "slug": "test-slug",
+      "catalogId": 1,
+      "productVariants": [
+        {
+          "optionName": "string",
+          "optionValues": [
+            "string"
+          ]
+        }
+      ],
+      "productImages": [
+        {
+          "url": compressedImage,
+          "altText": 'image'
+        }
+      ]
+    }
+    try {
+      const response = await fetch("http://localhost:3000/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify(
+          modifiedProduct
+        ),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        alert("Otp sent successfully!");
+        localStorage.setItem("email", form.email);
+        localStorage.setItem("isLoggedIn", "true");
+        if (data.previewUrl) {
+          window.open(data.previewUrl, "_blank");
+        }
+      } else {
+        alert(data.message || "error occured. Try again.");
+      }
+    } catch (error) {
+      console.error("login error:", error);
+      alert("Something went wrong. Please try again.");
+    }
   };
 
   const deleteCachedImage = (fileName) => {
@@ -774,7 +775,7 @@ export default function editProducts() {
                 </div>
 
                 {/* Product Creation Form */}
-                <form onSubmit={handleSubmitForm}>
+                <form onSubmit={handleSubmit}>
                   <div className="mt-4 space-y-4">
                     <div className="mb-4">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -787,7 +788,6 @@ export default function editProducts() {
                         onChange={handleInputChange}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         placeholder="Enter product name"
-                        required
                       />
                     </div>
 
@@ -802,7 +802,6 @@ export default function editProducts() {
                         onChange={handleInputChange}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         placeholder="Enter product description"
-                        required
                       />
                     </div>
 
@@ -819,7 +818,7 @@ export default function editProducts() {
                           onChange={handleInputChange}
                           className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                           placeholder="0.00"
-                          required
+
                         />
                         <span className="absolute right-3 top-2 text-gray-500">USD</span>
                       </div>
