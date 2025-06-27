@@ -16,8 +16,105 @@ export default function editProducts() {
   const [savedImage, setSavedImage] = useState(null);
   const product = useSelector((state) => state.product.selectedProduct);
   const dispatch = useDispatch();
-  const [imageKitUrl,setImageKitUrl]=useState(null)
+  const [imageKitUrl, setImageKitUrl] = useState(null)
   console.log("product==>>", product)
+
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    price: "",
+    variants: {
+      size: [],
+      color: [],
+    },
+    designData: "", // for hidden input, if you need to add data programmatically
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleVariantChange = (type, value) => {
+    setForm((prev) => {
+      const existing = prev.variants[type];
+      const updated = existing.includes(value)
+        ? existing.filter((v) => v !== value)
+        : [...existing, value];
+      return {
+        ...prev,
+        variants: {
+          ...prev.variants,
+          [type]: updated,
+        },
+      };
+    });
+  };
+
+  const handleSubmitForm = async (e) => {
+    e.preventDefault();
+
+    const payload = {
+      name: form.name,
+      description: form.description,
+      price: parseFloat(form.price),
+      variants: form.variants,
+      designData: form.designData,
+    };
+
+    console.log("payload==>>", payload)
+
+    console.log("dataURL==>>", savedImage)
+    const compressed = await compressBase64Image(savedImage, 800, 0.6);
+    console.log("Compressed image:", compressed);
+    let modifiedProduct = {
+      "name": product.name,
+      "description": "string",
+      "name": product.name,
+      "priceCents": product.price,
+      "priceCurrency": "string",
+      "slug": "test-slug",
+      "catalogId": 1,
+      "productVariants": [
+        {
+          "optionName": "string",
+          "optionValues": [
+            "string"
+          ]
+        }
+      ]
+    }
+    try {
+      const response = await fetch("http://localhost:3000/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          modifiedProduct
+        ),
+      });
+
+      const data = await response.json();
+
+
+      if (response.ok) {
+        alert("Otp sent successfully!");
+        localStorage.setItem("email", form.email);
+        localStorage.setItem("isLoggedIn", "true");
+
+        if (data.previewUrl) {
+          window.open(data.previewUrl, "_blank");
+        }
+        router.push("/user/verifyOtp");
+      } else {
+        alert(data.message || "error occured. Try again.");
+      }
+    } catch (error) {
+      console.error("login error:", error);
+      alert("Something went wrong. Please try again.");
+    }
+  };
 
   const printAreas = {
     tshirt: {
@@ -93,69 +190,69 @@ export default function editProducts() {
   };
 
   const handleSubmitcatalog = async (dataURL) => {
-  if (!product || !product.name) {
-    console.error('Product is missing:', product);
-    toast.error('Product data not available.');
-    return;
-  }
+    if (!product || !product.name) {
+      console.error('Product is missing:', product);
+      toast.error('Product data not available.');
+      return;
+    }
 
-  try {
-    const compressed = await compressBase64Image(dataURL, 800, 0.6);
+    try {
+      const compressed = await compressBase64Image(dataURL, 800, 0.6);
 
-    const blob = await (await fetch(compressed)).blob();
-    const file = new File([blob], `${product.name.replace(/\s+/g, '_')}.jpg`, {
-      type: 'image/jpeg',
-    });
+      const blob = await (await fetch(compressed)).blob();
+      const file = new File([blob], `${product.name.replace(/\s+/g, '_')}.jpg`, {
+        type: 'image/jpeg',
+      });
 
-    const formData = new FormData();
-    const token = localStorage.getItem("token", data.token);
-    formData.append('image', file);
+      const formData = new FormData();
+      const token = localStorage.getItem("token", data.token);
+      formData.append('image', file);
 
-    const uploadResponse = await fetch('http://localhost:3000/upload', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-         'Authorization': `Bearer ${token}`
-      },
-      body: formData,
-    });
-
-    const uploadData = await uploadResponse.json();
-    const imageKitUrl = uploadData.url;
-    console.log("imageKitUrl save handler==>>",imageKitUrl)
-
-    const modifiedProduct = {
-      name: product.name,
-      description: 'string',
-      priceCents: product.price,
-      priceCurrency: 'string',
-      slug: 'test-slug',
-      catalogId: 1,
-      image: imageKitUrl,
-      productVariants: [
-        {
-          optionName: 'string',
-          optionValues: ['string'],
+      const uploadResponse = await fetch('http://localhost:3000/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
-      ],
-    };
-    console.log("modifiedProduct==>>",modifiedProduct);
-    const response = await fetch('http://localhost:3000/products', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-         'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(modifiedProduct),
-    });
+        body: formData,
+      });
 
-    const data = await response.json();
-    console.log('Product saved:', data);
-  } catch (error) {
-    console.error('Upload or save error:', error);
-    toast.error('Something went wrong. Please try again.');
-  }
-};
+      const uploadData = await uploadResponse.json();
+      const imageKitUrl = uploadData.url;
+      console.log("imageKitUrl save handler==>>", imageKitUrl)
+
+      const modifiedProduct = {
+        name: product.name,
+        description: 'string',
+        priceCents: product.price,
+        priceCurrency: 'string',
+        slug: 'test-slug',
+        catalogId: 1,
+        image: imageKitUrl,
+        productVariants: [
+          {
+            optionName: 'string',
+            optionValues: ['string'],
+          },
+        ],
+      };
+      console.log("modifiedProduct==>>", modifiedProduct);
+      const response = await fetch('http://localhost:3000/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(modifiedProduct),
+      });
+
+      const data = await response.json();
+      console.log('Product saved:', data);
+    } catch (error) {
+      console.error('Upload or save error:', error);
+      toast.error('Something went wrong. Please try again.');
+    }
+  };
 
   // Load Fabric.js
   useEffect(() => {
@@ -205,7 +302,7 @@ export default function editProducts() {
 
   const loadBaseProductImage = (canvasInstance) => {
     // Using a placeholder image; replace with your carousel logic if needed
-    const imageSrc = product?.image; // Adjust path as needed
+    const imageSrc = product?.catalogImages?.[0]?.url; // Adjust path as needed
     fabric.Image.fromURL(imageSrc, (img) => {
       img.scaleToWidth(canvasInstance.width * 0.9);
       img.set({
@@ -357,39 +454,39 @@ export default function editProducts() {
   };
 
   const handleUpload = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+    const file = e.target.files[0];
+    if (!file) return;
 
-  // Optional: show preview
-  const reader = new FileReader();
-  reader.onload = (f) => {
-    cacheImage(file.name, file.type, file.size, f.target.result);
+    // Optional: show preview
+    const reader = new FileReader();
+    reader.onload = (f) => {
+      cacheImage(file.name, file.type, file.size, f.target.result);
+    };
+    reader.readAsDataURL(file);
+
+    // Step 1: Upload file to ImageKit through backend
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const res = await fetch('http://localhost:3000/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      const imageKitUrl = data.url;
+      setImageKitUrl(imageKitUrl)
+
+      // Step 2: Store the imageKitUrl in state
+      setSavedImage(imageKitUrl); // You already have setSavedImage
+
+      console.log('ImageKit URL:', imageKitUrl);
+    } catch (err) {
+      console.error('Image upload failed:', err);
+      alert('Image upload failed. Please try again.');
+    }
   };
-  reader.readAsDataURL(file);
-
-  // Step 1: Upload file to ImageKit through backend
-  const formData = new FormData();
-  formData.append('image', file);
-
-  try {
-    const res = await fetch('http://localhost:3000/upload', {
-      method: 'POST',
-      body: formData,
-    });
-
-    const data = await res.json();
-    const imageKitUrl = data.url;
-    setImageKitUrl(imageKitUrl)
-
-    // Step 2: Store the imageKitUrl in state
-    setSavedImage(imageKitUrl); // You already have setSavedImage
-
-    console.log('ImageKit URL:', imageKitUrl);
-  } catch (err) {
-    console.error('Image upload failed:', err);
-    alert('Image upload failed. Please try again.');
-  }
-};
 
 
   const cacheImage = (name, type, size, dataURL) => {
@@ -567,10 +664,10 @@ export default function editProducts() {
                   </h2>
                 </div>
                 <div className="p-4 h-[calc(100%-68px)] flex items-center justify-center">
-                  <canvas 
-                    ref={canvasRef} 
-                    width="800" 
-                    height="600" 
+                  <canvas
+                    ref={canvasRef}
+                    width="800"
+                    height="600"
                     className="max-w-full max-h-full border border-gray-200"
                   ></canvas>
                 </div>
@@ -677,94 +774,123 @@ export default function editProducts() {
                 </div>
 
                 {/* Product Creation Form */}
-                <div className="mt-4 space-y-4">
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
-                    <input 
-                      type="text" 
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
-                      placeholder="Enter product name" 
-                      required 
-                    />
-                  </div>
-
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea 
-                      rows={3} 
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
-                      placeholder="Enter product description" 
-                      required 
-                    />
-                  </div>
-
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
-                    <div className="relative">
-                      <input 
-                        type="number" 
-                        step="0.01" 
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
-                        placeholder="0.00" 
-                        required 
+                <form onSubmit={handleSubmitForm}>
+                  <div className="mt-4 space-y-4">
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Product Name
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={form.name}
+                        onChange={handleInputChange}
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="Enter product name"
+                        required
                       />
-                      <span className="absolute right-3 top-2 text-gray-500">USD</span>
                     </div>
-                  </div>
 
-                  {/* Variants Section */}
-                  <div className="mb-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Product Variants</h4>
-                    <div className="space-y-3">
-                      {/* Example variant - you would map through your variants in a real app */}
-                      <div className="border-b pb-3">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="font-medium">Size</span>
-                        </div>
-                        <div className="flex flex-wrap gap-3">
-                          {['S', 'M', 'L', 'XL'].map(size => (
-                            <label key={size} className="inline-flex items-center">
-                              <input 
-                                type="checkbox" 
-                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" 
-                              />
-                              <span className="ml-2 text-gray-700">{size}</span>
-                            </label>
-                          ))}
-                        </div>
-                      </div>
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Description
+                      </label>
+                      <textarea
+                        rows={3}
+                        name="description"
+                        value={form.description}
+                        onChange={handleInputChange}
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="Enter product description"
+                        required
+                      />
+                    </div>
 
-                      <div className="border-b pb-3">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="font-medium">Color</span>
-                        </div>
-                        <div className="flex flex-wrap gap-3">
-                          {['Red', 'Blue', 'Green', 'Black'].map(color => (
-                            <label key={color} className="inline-flex items-center">
-                              <input 
-                                type="checkbox" 
-                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" 
-                              />
-                              <span className="ml-2 text-gray-700">{color}</span>
-                            </label>
-                          ))}
-                        </div>
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Price
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          step="0.01"
+                          name="price"
+                          value={form.price}
+                          onChange={handleInputChange}
+                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          placeholder="0.00"
+                          required
+                        />
+                        <span className="absolute right-3 top-2 text-gray-500">USD</span>
                       </div>
                     </div>
+
+                    {/* Variants Section */}
+                    <div className="mb-4">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">
+                        Product Variants
+                      </h4>
+                      <div className="space-y-3">
+                        <div className="border-b pb-3">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-medium">Size</span>
+                          </div>
+                          <div className="flex flex-wrap gap-3">
+                            {["S", "M", "L", "XL"].map((size) => (
+                              <label key={size} className="inline-flex items-center">
+                                <input
+                                  type="checkbox"
+                                  checked={form.variants.size.includes(size)}
+                                  onChange={() => handleVariantChange("size", size)}
+                                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                />
+                                <span className="ml-2 text-gray-700">{size}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="border-b pb-3">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-medium">Color</span>
+                          </div>
+                          <div className="flex flex-wrap gap-3">
+                            {["Red", "Blue", "Green", "Black"].map((color) => (
+                              <label key={color} className="inline-flex items-center">
+                                <input
+                                  type="checkbox"
+                                  checked={form.variants.color.includes(color)}
+                                  onChange={() => handleVariantChange("color", color)}
+                                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                />
+                                <span className="ml-2 text-gray-700">{color}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Hidden field for design data */}
+                    <input
+                      type="hidden"
+                      id="custom-design-data"
+                      value={form.designData}
+                      onChange={(e) =>
+                        setForm((prev) => ({ ...prev, designData: e.target.value }))
+                      }
+                    />
+
+                    {/* Submit Button */}
+                    <button
+                      type="submit"
+                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                    >
+                      Create Product
+                    </button>
                   </div>
+                </form>
 
-                  {/* Hidden field for design data */}
-                  <input type="hidden" id="custom-design-data" />
-
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-                    onClick={handleSubmitcatalog}
-                  >
-                    Create Product
-                  </button>
-                </div>
               </div>
             </div>
           </div>

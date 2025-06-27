@@ -34,7 +34,8 @@ export default function RootLayout({ children }) {
   }
   const pathname = usePathname();
   console.log("pathname==>>", pathname)
-  const isLoginPage = pathname !== "/";
+  const loginPaths = ["/", "/user/login", "/user/signup"];
+  const isLoginPage = !loginPaths.includes(pathname);
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
