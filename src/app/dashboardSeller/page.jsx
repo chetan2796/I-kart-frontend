@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import FabricCanvas from "../components/FabricCanvas";
 import Link from "next/link";
 import Image from "next/image";
@@ -18,11 +18,17 @@ const DashboardSeller = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-
   useEffect(() => {
     const fetchProducts = async () => {
+      const authToken = localStorage.getItem("token");
       try {
-        const response = await fetch("http://localhost:3000/products");
+        const response = await fetch("http://localhost:3000/products", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${authToken}`,
+          },
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -39,19 +45,18 @@ const DashboardSeller = () => {
     fetchProducts();
   }, []);
 
-
   const getData = async () => {
-    const response = await fetch('http://localhost:3000/')
-  }
+    const response = await fetch("http://localhost:3000/");
+  };
 
   useEffect(() => {
-    getData()
-  }, [])
+    getData();
+  }, []);
 
   const cardClickHandler = (product) => {
     router.push(`posts/${product.id}`);
     dispatch(setSelectedProduct(product));
-  }
+  };
 
   return (
     <RequireAuth>
@@ -72,7 +77,11 @@ const DashboardSeller = () => {
           {/* Product Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
             {products.map((product, index) => (
-              <Card cardClickHandler={cardClickHandler} product={product} key={product.id} />
+              <Card
+                cardClickHandler={cardClickHandler}
+                product={product}
+                key={product.id}
+              />
             ))}
           </div>
         </div>
