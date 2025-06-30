@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { useSelector, useDispatch } from 'react-redux';
 import { setSelectedProductList } from '../../lib/features/editProducts/editProductListSlice';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 
 export default function editProducts() {
   const canvasRef = useRef(null);
@@ -20,7 +21,7 @@ export default function editProducts() {
   const [productData, setProductData] = useState(localStorage.getItem("productInfo") ? JSON.parse(localStorage.getItem("productInfo")) : null);
   console.log("product==>>", product)
   const [authToken, setAuthToken] = useState(null)
-
+  const router = useRouter();
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -61,71 +62,6 @@ export default function editProducts() {
   const availableVariants = productData.catalogVariants.reduce((acc, variant) => {
     return { ...acc, [variant.optionName]: variant.optionValues };
   }, {});
-
-  // const handleSubmitForm = async (e) => {
-  //   e.preventDefault();
-
-  //   const payload = {
-  //     name: form.name,
-  //     description: form.description,
-  //     price: parseFloat(form.price),
-  //     variants: form.variants,
-  //     designData: form.designData,
-  //   };
-
-  //   console.log("payload==>>", payload)
-
-  //   console.log("dataURL==>>", savedImage)
-  //   const compressed = await compressBase64Image(savedImage, 800, 0.6);
-  //   console.log("Compressed image:", compressed);
-  //   let modifiedProduct = {
-  //     "name": product.name,
-  //     "description": "string",
-  //     "name": product.name,
-  //     "priceCents": product.price,
-  //     "priceCurrency": "string",
-  //     "slug": "test-slug",
-  //     "catalogId": 1,
-  //     "productVariants": [
-  //       {
-  //         "optionName": "string",
-  //         "optionValues": [
-  //           "string"
-  //         ]
-  //       }
-  //     ]
-  //   }
-  //   try {
-  //     const response = await fetch("http://localhost:3000/products", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(
-  //         modifiedProduct
-  //       ),
-  //     });
-
-  //     const data = await response.json();
-
-
-  //     if (response.ok) {
-  //       alert("Otp sent successfully!");
-  //       localStorage.setItem("email", form.email);
-  //       localStorage.setItem("isLoggedIn", "true");
-
-  //       if (data.previewUrl) {
-  //         window.open(data.previewUrl, "_blank");
-  //       }
-  //       router.push("/user/verifyOtp");
-  //     } else {
-  //       alert(data.message || "error occured. Try again.");
-  //     }
-  //   } catch (error) {
-  //     console.error("login error:", error);
-  //     alert("Something went wrong. Please try again.");
-  //   }
-  // };
 
   const printAreas = {
     tshirt: {
@@ -613,12 +549,9 @@ export default function editProducts() {
       });
       const data = await response.json();
       if (response.ok) {
-        alert("Otp sent successfully!");
         localStorage.setItem("email", form.email);
         localStorage.setItem("isLoggedIn", "true");
-        if (data.previewUrl) {
-          window.open(data.previewUrl, "_blank");
-        }
+        router.push('/dashboardSeller');
       } else {
         alert(data.message || "error occured. Try again.");
       }
