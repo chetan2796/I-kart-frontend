@@ -13,7 +13,7 @@ const Header = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/auth/signout", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/signout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

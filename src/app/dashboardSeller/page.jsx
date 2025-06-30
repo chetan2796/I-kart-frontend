@@ -22,7 +22,7 @@ const DashboardSeller = () => {
     const fetchProducts = async () => {
       const authToken = localStorage.getItem("token");
       try {
-        const response = await fetch("http://localhost:3000/products", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/products`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -46,7 +46,7 @@ const DashboardSeller = () => {
   }, []);
 
   const getData = async () => {
-    const response = await fetch("http://localhost:3000/");
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/`);
   };
 
   useEffect(() => {

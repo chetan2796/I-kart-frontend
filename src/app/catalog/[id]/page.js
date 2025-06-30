@@ -537,7 +537,7 @@ export default function editProducts() {
       ]
     }
     try {
-      const response = await fetch("http://localhost:3000/products", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/products`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

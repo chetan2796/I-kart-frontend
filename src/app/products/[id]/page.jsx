@@ -12,7 +12,7 @@ export default function ProductPage({ params }) {
     const fetchProduct = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:3000/products/${params.id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/products/${params.id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',

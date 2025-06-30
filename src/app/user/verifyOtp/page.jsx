@@ -24,7 +24,7 @@ export default function LoginPage() {
 
     const email = form.email || localStorage.getItem("email");
     try {
-      const response = await fetch("http://localhost:3000/auth/otp/verify", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/otp/verify`, {        
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -23,7 +23,7 @@ export default function LoginPage() {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/auth/otp/generate", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/otp/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
