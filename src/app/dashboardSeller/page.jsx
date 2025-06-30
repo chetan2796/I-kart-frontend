@@ -68,7 +68,7 @@ const DashboardSeller = () => {
         <div className="flex-1 px-4 py-6">
           <h1 className="text-3xl font-bold mb-6 text-gray-800">Products</h1>
 
-          <Link href="/newProducts">
+          <Link href="/catalogs">
             <button className="bg-gray-200 text-black px-4 py-2 rounded mb-6 hover:bg-gray-300 transition cursor-pointer">
               New Product
             </button>

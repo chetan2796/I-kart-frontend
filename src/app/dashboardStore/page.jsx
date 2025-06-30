@@ -57,7 +57,7 @@ const DashboardStore = () => {
         <h1 className="text-2xl font-bold mb-6">Products</h1>
 
         <button className="bg-amber-400 text-black px-4 py-2 rounded mb-4">
-          <Link href="/newProducts">New Product</Link>
+          <Link href="/catalogs">New Product</Link>
         </button>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
