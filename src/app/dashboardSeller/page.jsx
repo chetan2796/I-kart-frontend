@@ -54,7 +54,7 @@ const DashboardSeller = () => {
   }, []);
 
   const cardClickHandler = (product) => {
-    router.push(`posts/${product.id}`);
+    router.push(`products/${product.id}`);
     dispatch(setSelectedProduct(product));
   };
 
