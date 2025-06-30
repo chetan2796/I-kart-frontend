@@ -58,6 +58,10 @@ export default function editProducts() {
     setAuthToken(authToken)
   }, [])
 
+  const availableVariants = productData.catalogVariants.reduce((acc, variant) => {
+    return { ...acc, [variant.optionName]: variant.optionValues };
+  }, {});
+
   // const handleSubmitForm = async (e) => {
   //   e.preventDefault();
 
@@ -816,45 +820,25 @@ export default function editProducts() {
                       <h4 className="text-sm font-medium text-gray-700 mb-2">
                         Product Variants
                       </h4>
-                      <div className="space-y-3">
-                        <div className="border-b pb-3">
+                      {Object.entries(availableVariants).map(([variantName, options]) => (
+                        <div key={variantName} className="border-b pb-3">
                           <div className="flex justify-between items-center mb-2">
-                            <span className="font-medium">Size</span>
+                            <span className="font-medium">{variantName}</span>
                           </div>
                           <div className="flex flex-wrap gap-3">
-                            {["S", "M", "L", "XL"].map((size) => (
-                              <label key={size} className="inline-flex items-center">
+                            {options.map((option) => (
+                              <label key={option} className="inline-flex items-center">
                                 <input
                                   type="checkbox"
-                                  checked={form.variants.size.includes(size)}
-                                  onChange={() => handleVariantChange("size", size)}
+                                  onChange={() => handleVariantChange(variantName, option)}
                                   className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                                 />
-                                <span className="ml-2 text-gray-700">{size}</span>
+                                <span className="ml-2 text-gray-700">{option}</span>
                               </label>
                             ))}
                           </div>
                         </div>
-
-                        <div className="border-b pb-3">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="font-medium">Color</span>
-                          </div>
-                          <div className="flex flex-wrap gap-3">
-                            {["Red", "Blue", "Green", "Black"].map((color) => (
-                              <label key={color} className="inline-flex items-center">
-                                <input
-                                  type="checkbox"
-                                  checked={form.variants.color.includes(color)}
-                                  onChange={() => handleVariantChange("color", color)}
-                                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                                />
-                                <span className="ml-2 text-gray-700">{color}</span>
-                              </label>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
+                      ))}
                     </div>
 
                     {/* Hidden field for design data */}
