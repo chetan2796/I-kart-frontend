@@ -10,9 +10,9 @@ const Card = ({ cardClickHandler, product }) => {
       <div className="block">
         {/* Image container with fixed aspect ratio */}
         <div className="relative h-40 mb-3 rounded-sm bg-gray-100">
-          {product?.catalogImages?.[0]?.url && (
+          {product?.productImages?.[0]?.url && (
             <Image
-              src={product?.catalogImages?.[0]?.url}
+              src={product?.productImages?.[0]?.url}
               alt={product.name}
               fill
               className="object-cover"

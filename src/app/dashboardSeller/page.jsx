@@ -18,10 +18,18 @@ const DashboardSeller = () => {
   const [loading, setLoading] = useState(true);
 
 
-  useEffect(() => {
+useEffect(() => {
     const fetchProducts = async () => {
+      const authToken = localStorage.getItem('token')
       try {
-        const response = await fetch("http://localhost:3000/products");
+        const response = await fetch("http://localhost:3000/products", {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+        });
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -37,7 +45,6 @@ const DashboardSeller = () => {
 
     fetchProducts();
   }, []);
-
 
   const getData = async () => {
     const response = await fetch('http://localhost:3000/')

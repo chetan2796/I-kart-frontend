@@ -17,8 +17,10 @@ export default function editProducts() {
   const product = useSelector((state) => state.product.selectedProduct);
   const dispatch = useDispatch();
   const [imageKitUrl, setImageKitUrl] = useState(null);
+  const [productData, setProductData] = useState(null);
+  console.log("product==>>", product)
+  const [authToken, setAuthToken] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -53,7 +55,7 @@ export default function editProducts() {
 
 
 
-const handleSubmitForm = async (e) => {
+  const handleSubmitForm = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -107,7 +109,6 @@ const handleSubmitForm = async (e) => {
       const formData = new FormData();
       const token = localStorage.getItem("token");
       formData.append('image', file);
-      debugger
       const uploadResponse = await fetch('http://localhost:3000/upload', {
         method: 'POST',
         headers: {
@@ -121,12 +122,12 @@ const handleSubmitForm = async (e) => {
 
       // Prepare the product payload with images as array
       const payload = {
-        name: product.name,
-        description: product.description,
+        name: form.name,
+        description: form.description,
         priceCents: parseFloat(form.price) * 100, // Convert to cents if needed
         priceCurrency: "USD",
-        slug: product.name.toLowerCase().replace(/\s+/g, '-'),
-        catalogId: product["categoryId"],
+        slug: form.name.toLowerCase().replace(/\s+/g, '-'),
+        catalogId: form["categoryId"],
         productImages: [
           {
             url: imageKitUrl, 
@@ -144,7 +145,6 @@ const handleSubmitForm = async (e) => {
           },
         ],
       };
-
       // Submit the product data
       const response = await fetch("http://localhost:3000/products", {
         method: "POST",
@@ -152,7 +152,11 @@ const handleSubmitForm = async (e) => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          userId: 3,
+          catalogId: 4,
+          ...payload
+        })
       });
 
       const data = await response.json();
@@ -452,7 +456,7 @@ const handleSubmitForm = async (e) => {
     if (modal) modal.hide();
   };
 
-  const handleUpload = async (e) => {
+  const handleUpload  = async  (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -470,8 +474,6 @@ const handleSubmitForm = async (e) => {
         method: 'POST',
         body: formData,
       });
-
-
       const data = await res.json();
       const imageKitUrl = data.url;
       setImageKitUrl(imageKitUrl);
