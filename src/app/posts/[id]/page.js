@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { useSelector, useDispatch } from 'react-redux';
 import { setSelectedProductList } from '../../lib/features/editProducts/editProductListSlice';
 import { toast } from 'react-toastify';
+import jwt_decode from "jwt-decode";
 
 export default function editProducts() {
   const canvasRef = useRef(null);
@@ -58,6 +59,20 @@ export default function editProducts() {
   const handleSubmitForm = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+
+    const token = localStorage.getItem("token");
+
+    let userId = null;
+
+    if (token) {
+      try {
+        const decoded = jwt_decode(token);
+        userId = decoded.userId || decoded.id; 
+      } catch (err) {
+        console.error("Invalid token");
+        return;
+      }
+    }
 
     try {
       // First, save the canvas design as an image
@@ -127,7 +142,7 @@ export default function editProducts() {
         priceCents: parseFloat(form.price) * 100, // Convert to cents if needed
         priceCurrency: "USD",
         slug: form.name.toLowerCase().replace(/\s+/g, '-'),
-        catalogId: form["categoryId"],
+        catalogId: form["catalogId"], 
         productImages: [
           {
             url: imageKitUrl, 
@@ -145,6 +160,7 @@ export default function editProducts() {
           },
         ],
       };
+      debugger
       // Submit the product data
       const response = await fetch("http://localhost:3000/products", {
         method: "POST",
@@ -153,8 +169,8 @@ export default function editProducts() {
           "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userId: 3,
-          catalogId: 4,
+          userId,
+          catalogId,
           ...payload
         })
       });
@@ -295,7 +311,7 @@ export default function editProducts() {
   useEffect(() => {
     const cached = localStorage.getItem('recentImages');
     if (cached) {
-      setRecentImages(JSON.parse(cached));
+      setRecentImages(JSON.pars(cached));
     }
   }, []);
 

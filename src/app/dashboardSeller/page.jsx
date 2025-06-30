@@ -19,29 +19,29 @@ const DashboardSeller = () => {
 
 
 useEffect(() => {
-    const fetchProducts = async () => {
-      const authToken = localStorage.getItem('token')
-      try {
-        const response = await fetch("http://localhost:3000/products", {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authToken}`
-          },
-        });
+  const fetchProducts = async () => {
+    const authToken = localStorage.getItem('token')
+    try {
+      const response = await fetch("http://localhost:3000/products", {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
+      });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setProducts(data);
-      } catch (err) {
-        setError(err.message);
-        console.error("Error fetching products:", err);
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
+      const data = await response.json();
+      setProducts(data);
+    } catch (err) {
+      setError(err.message);
+      console.error("Error fetching products:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
     fetchProducts();
   }, []);
