@@ -158,7 +158,7 @@ export default function StoreShowPage() {
                 <p className="text-blue-600 font-bold text-md mt-2">
                   ₹ {(product.priceCents / 100).toFixed(2)}
                 </p>
-                <Link href={`products/${product.id}`}>
+                <Link href={`/products/${product.id}`}>
                   <button className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
                     View Product
                   </button>
