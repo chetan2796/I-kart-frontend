@@ -1,8 +1,6 @@
 'use client'
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "./components/Header";
-import SideBar from "./components/Sidebar";
 import { usePathname } from "next/navigation";
 import { useRef } from "react";
 import { Provider } from "react-redux";
@@ -34,7 +32,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {isLoginPage && <Header />}
         <Provider store={storeRef.current}>{children}
           <ToastContainer
             position="top-center"
