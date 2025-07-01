@@ -4,10 +4,12 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Sidebar from '../../../components/Sidebar';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function StoreShowPage() {
   const { id } = useParams();
   const [store, setStore] = useState(null);
+  const [storeProducts, setStoreProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [products, setProducts] = useState([]);
@@ -34,7 +36,26 @@ export default function StoreShowPage() {
       }
     };
 
+    const fetchStoreProducts = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`http://localhost:3000/store-products/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!res.ok) throw new Error('Failed to fetch store products');
+        const data = await res.json();
+        setStoreProducts(data);
+      }
+      catch (error) {
+        console.error('Error fetching store products:', error);
+      }
+    };
+
     if (id) fetchStore();
+    if (id) fetchStoreProducts();
   }, [id]);
 
   const fetchProducts = async () => {
@@ -71,13 +92,15 @@ export default function StoreShowPage() {
   const handleSubmit = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3000/stores/${id}/add-products`, {
+      const res = await fetch(`http://localhost:3000/store-products`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ productIds: selectedProductIds }),
+        body: JSON.stringify({ 
+          productIds: selectedProductIds,
+          storeId: Number(id) }),
       });
 
       if (!res.ok) throw new Error('Failed to add products');
@@ -118,6 +141,32 @@ export default function StoreShowPage() {
         </div>
 
         <p className="text-xl text-gray-700">Price: ₹ {store.price}</p>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {storeProducts.map((product) => (
+            <div
+              key={product.id}
+              className="bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden"
+            >
+              <div className="p-4">
+                <h2 className="text-lg font-semibold text-gray-800">
+                  {product.name}
+                </h2>
+                <p className="text-gray-600 mt-1">
+                  {product.description}
+                </p>
+                <p className="text-blue-600 font-bold text-md mt-2">
+                  ₹ {(product.priceCents / 100).toFixed(2)}
+                </p>
+                <Link href={`products/${product.id}`}>
+                  <button className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
+                    View Product
+                  </button>
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
 
         {/* Modal */}
         {showModal && (
