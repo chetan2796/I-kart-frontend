@@ -5,10 +5,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from 'react-toastify';
 import { useRedirectIfAuthenticated } from '../../lib/hooks/useRedirectIfAuthenticated';
+import LoadingButton from "../../components/LoadingButton";
 
 export default function User() {
   const router = useRouter();
-  const [form, setForm] = useState({ email: "", phone: "", username: "", roleId: 1});
+  const [form, setForm] = useState({ email: "", phone: "", username: "" });
+  const [loading, setLoading] = useState(false);
 
   const checking = useRedirectIfAuthenticated();
   if (checking) return null;
@@ -48,6 +50,7 @@ export default function User() {
       return;
     }
 
+  setLoading(true);
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/signup`, {
       method: "POST",
@@ -58,7 +61,7 @@ export default function User() {
         email: form.email,
         phone: form.phone,
         username: form.username,
-        roleId: form.roleId,
+        roleName: 'seller',
       }),
     });
 
@@ -73,6 +76,8 @@ export default function User() {
   } catch (error) {
     console.error("Signup error:", error);
     toast.error("Something went wrong. Please try again.");
+  } finally {
+    setLoading(false);
   }
 };
 
@@ -98,27 +103,9 @@ export default function User() {
               <input type="text"  value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} placeholder="Enter your username" className="w-full px-4 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
             </div>
 
-            <button type="submit" className="w-full px-4 py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">
+            <LoadingButton loading={loading} type="submit" className="w-full px-4 py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 cursor-pointer">
               Sign Up
-            </button>
-
-            <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
-              <hr className="w-20" /> or <hr className="w-20" />
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setForm({ ...form, roleId: 2 });
-                setTimeout(() => {
-                  document.getElementById("signupForm").requestSubmit(); 
-                }, 0);
-              }}
-              className="w-full px-4 py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700"
-            >
-              Sign Up as a Seller
-            </button>
-
+            </LoadingButton>
           </form>
 
           <p className="text-sm text-center text-gray-600">

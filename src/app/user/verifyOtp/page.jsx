@@ -6,10 +6,12 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from 'react-toastify';
 import { useRedirectIfAuthenticated } from '../../lib/hooks/useRedirectIfAuthenticated';
+import LoadingButton from "../../components/LoadingButton";
 
 export default function LoginPage() {
   const router = useRouter();
   const [form, setForm] = useState({ code: "", email: "" });
+  const [loading, setLoading] = useState(false);
 
   const checking = useRedirectIfAuthenticated();
   if (checking) return null;
@@ -22,6 +24,7 @@ export default function LoginPage() {
       return;
     }
 
+    setLoading(true);
     const email = form.email || localStorage.getItem("email");
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/otp/verify`, {        
@@ -49,6 +52,8 @@ export default function LoginPage() {
     } catch (error) {
       console.error("login error:", error);
       toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,9 +74,9 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <button type="submit" className="w-full px-4 py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">
-              Sign in
-            </button>
+            <LoadingButton loading={loading} type="submit" className="w-full px-4 py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 cursor-pointer">
+              Verify OTP
+            </LoadingButton>
           </form>
         </div>
       </div>
