@@ -1,12 +1,11 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
-import { useSelector, useDispatch } from 'react-redux';
-import { setSelectedProductList } from '../../lib/features/editProducts/editProductListSlice';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 
-export default function editProducts() {
+export default function editProducts({ params }) {
+  const { id } = React.use(params);
   const canvasRef = useRef(null);
   const [canvas, setCanvas] = useState(null);
   const [fabric, setFabric] = useState(null);
@@ -15,21 +14,16 @@ export default function editProducts() {
   const [productType, setProductType] = useState('tshirt');
   const formRef = useRef(null);
   const [savedImage, setSavedImage] = useState(null);
-  const product = useSelector((state) => state.product.selectedProduct);
-  const dispatch = useDispatch();
   const [imageKitUrl, setImageKitUrl] = useState(null)
-  const [productData, setProductData] = useState(localStorage.getItem("productInfo") ? JSON.parse(localStorage.getItem("productInfo")) : null);
-  console.log("product==>>", product)
+  const [catalog, setCatalog] = useState(null);
+  const [catalogVariants, setCatalogVariants] = useState([]);
   const [authToken, setAuthToken] = useState(null)
   const router = useRouter();
   const [form, setForm] = useState({
     name: "",
     description: "",
     price: "",
-    variants: {
-      size: [],
-      color: [],
-    },
+    variants: {},
     designData: "", // for hidden input, if you need to add data programmatically
   });
 
@@ -40,7 +34,7 @@ export default function editProducts() {
 
   const handleVariantChange = (type, value) => {
     setForm((prev) => {
-      const existing = prev.variants[type];
+    const existing = prev.variants[type] || [];
       const updated = existing.includes(value)
         ? existing.filter((v) => v !== value)
         : [...existing, value];
@@ -54,14 +48,30 @@ export default function editProducts() {
     });
   };
 
-  useEffect(() => {
-    const authToken = localStorage.getItem('token')
-    setAuthToken(authToken)
-  }, [])
+  const fetchCatalog = async () => {
+    try {
+      const authToken = localStorage.getItem('token')
+      setAuthToken(authToken)
+      const res = await fetch(`http://localhost:3000/catalogs/${id}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!res.ok) throw new Error('Failed to fetch catalog');
+      const data = await res.json();
+      setCatalog(data);
+      setCatalogVariants(data.catalogVariants.reduce((acc, variant) => {
+        return { ...acc, [variant.optionName]: variant.optionValues };
+      }, {}));
+    } catch (error) {
+      console.error(error);
+    };
+  };
 
-  const availableVariants = productData.catalogVariants.reduce((acc, variant) => {
-    return { ...acc, [variant.optionName]: variant.optionValues };
-  }, {});
+  useEffect(() => {
+    if (id) fetchCatalog();
+  }, [id]);
 
   const printAreas = {
     tshirt: {
@@ -136,7 +146,6 @@ export default function editProducts() {
     });
   };
 
-
   // Load Fabric.js
   useEffect(() => {
     const loadFabric = async () => {
@@ -155,7 +164,7 @@ export default function editProducts() {
 
   // Initialize canvas
   useEffect(() => {
-    if (fabric && canvasRef.current) {
+    if (catalog && fabric && canvasRef.current) {
       const newCanvas = new fabric.Canvas(canvasRef.current, {
         backgroundColor: '#ffffff',
         selection: true,
@@ -167,7 +176,7 @@ export default function editProducts() {
         newCanvas.dispose();
       };
     }
-  }, [fabric, productType]);
+  }, [catalog, fabric, productType]);
 
   // Load recent images
   useEffect(() => {
@@ -185,7 +194,7 @@ export default function editProducts() {
 
   const loadBaseProductImage = (canvasInstance) => {
     // Using a placeholder image; replace with your carousel logic if needed
-    const imageSrc = product?.catalogImages?.[0]?.url; // Adjust path as needed
+    const imageSrc = catalog?.catalogImages?.[0]?.url; // Adjust path as needed
     fabric.Image.fromURL(imageSrc, (img) => {
       img.scaleToWidth(canvasInstance.width * 0.9);
       img.set({
@@ -366,7 +375,6 @@ export default function editProducts() {
     reader.readAsDataURL(file);
   };
 
-
   const cacheImage = (name, type, size, dataURL) => {
     const updatedImages = [...recentImages];
     const existingIndex = updatedImages.findIndex((img) => img.name === name);
@@ -439,7 +447,6 @@ export default function editProducts() {
     });
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!canvas) return;
@@ -465,10 +472,6 @@ export default function editProducts() {
     alert('Design saved')
     setupPrintArea(canvas, productType);
     setSavedImage(dataURL)
-    dispatch(setSelectedProductList(dataURL))
-
-
-
     const payload = {
       name: form.name,
       description: form.description,
@@ -481,22 +484,17 @@ export default function editProducts() {
     console.log("saved iamge==>>", savedImage)
     const compressedImage = await compressBase64Image(dataURL, 800, 0.6);
     console.log("CompressedImage image:", compressedImage);
-
     let modifiedProduct = {
-      "name": productData.name,
+      "name": catalog.name,
       "description": payload.description,
       "priceCents": payload.price || 100,
       "priceCurrency": "USD",
-      "slug": generateRandomSlug(productData.name),
+      "slug": generateRandomSlug(catalog.name),
       "catalogId": printArea.catalogId || 1,
-      "productVariants": [
-        {
-          "optionName": "string",
-          "optionValues": [
-            "string"
-          ]
-        }
-      ],
+      "productVariants": Object.entries(payload.variants).map(([optionName, optionValues]) => ({
+        optionName,
+        optionValues,
+      })),
       "productImages": [
         {
           "url": compressedImage,
@@ -534,6 +532,7 @@ export default function editProducts() {
     const randomNumber = Math.floor(Math.random() * 1000); // Random number (0-999)
     return `product-${randomString}-${randomNumber}`;
   };
+
   const deleteCachedImage = (fileName) => {
     if (confirm(`Are you sure you want to delete ${fileName}?`)) {
       const updatedImages = recentImages.filter((img) => img.name !== fileName);
@@ -721,7 +720,7 @@ export default function editProducts() {
                       <h4 className="text-sm font-medium text-gray-700 mb-2">
                         Product Variants
                       </h4>
-                      {Object.entries(availableVariants).map(([variantName, options]) => (
+                      {Object.entries(catalogVariants).map(([variantName, options]) => (
                         <div key={variantName} className="border-b pb-3">
                           <div className="flex justify-between items-center mb-2">
                             <span className="font-medium">{variantName}</span>

@@ -6,13 +6,14 @@ import RequireAuth from "../../components/RequireAuth";
 
 
 export default function ProductPage({ params }) {
+  const { id } = React.use(params);
   const [product, setProduct] = useState(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/products/${params.id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/products/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -26,8 +27,8 @@ export default function ProductPage({ params }) {
       }
     };
 
-    if (params.id) fetchProduct();
-  }, [params.id]);
+    if (id) fetchProduct();
+  }, [id]);
 
   if (!product) return <div className="flex justify-center items-center h-screen">Loading...</div>;
 
