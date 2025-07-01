@@ -3,10 +3,11 @@
 import { useMemo, useState } from 'react';
 import Sidebar from "../../../components/Sidebar";
 import RequireAuth from '../../../components/RequireAuth';
-
+import { useRouter } from 'next/navigation';
 
 export default function AddStoreForm() {
   const slug = useMemo(() => `store-${crypto.randomUUID()}`, []);
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
     logo: null,
@@ -58,7 +59,8 @@ export default function AddStoreForm() {
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-
+      
+      router.push("/dashboardStore/store");
       const result = await response.json();
       console.log('Store created successfully:', result);
     } catch (error) {
