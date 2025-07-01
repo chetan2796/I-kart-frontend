@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import Sidebar from "../../../components/Sidebar";
 import RequireAuth from '../../../components/RequireAuth';
 
+
 export default function AddStoreForm() {
   const slug = useMemo(() => `store-${crypto.randomUUID()}`, []);
   const [formData, setFormData] = useState({
