@@ -418,34 +418,6 @@ export default function editProducts() {
     }
   };
 
-  // const validateDesignPosition = (canvasInstance) => {
-  //   const printArea = canvasInstance.getObjects().find((obj) => obj.name === 'print-area');
-  //   if (!printArea) return true;
-  //   const customObjects = canvasInstance.getObjects().filter((obj) =>
-  //     obj.name && obj.name.includes('custom')
-  //   );
-  //   return customObjects.every((obj) => {
-  //     const objBounds = {
-  //       left: obj.left - (obj.width * obj.scaleX) / 2,
-  //       right: obj.left + (obj.width * obj.scaleX) / 2,
-  //       top: obj.top - (obj.height * obj.scaleY) / 2,
-  //       bottom: obj.top + (obj.height * obj.scaleY) / 2,
-  //     };
-  //     const areaBounds = {
-  //       left: printArea.left - printArea.width / 2,
-  //       right: printArea.left + printArea.width / 2,
-  //       top: printArea.top - printArea.height / 2,
-  //       bottom: printArea.top + printArea.height / 2,
-  //     };
-  //     return (
-  //       objBounds.right <= areaBounds.right &&
-  //       objBounds.left >= areaBounds.left &&
-  //       objBounds.bottom <= areaBounds.bottom &&
-  //       objBounds.top >= areaBounds.top
-  //     );
-  //   });
-  // };
-
   const validateDesignPosition = (canvasInstance) => {
     const printArea = canvasInstance.getObjects().find((obj) => obj.name === 'print-area');
     if (!printArea) return true;
@@ -490,13 +462,9 @@ export default function editProducts() {
     let dataURL;
     dataURL = canvas.toDataURL({ format: 'png', quality: 1.0 });
     console.log('Design saved:', dataURL); // Replace with actual form submission
-    // Optionally, reset the print area border
     alert('Design saved')
     setupPrintArea(canvas, productType);
     setSavedImage(dataURL)
-    // let modifiedProduct = [];
-    // modifiedProduct.push(({ ...product, image: dataURL }))
-    // saveProductHandler(dataURL)
     dispatch(setSelectedProductList(dataURL))
 
 
