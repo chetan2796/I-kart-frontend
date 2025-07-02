@@ -44,19 +44,7 @@ const NewProducts = () => {
     dispatch(setSelectedProduct(product));
   };
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen">
-        <Sidebar />
-        <div className="container mx-auto px-4 py-6">
-          <h1 className="text-2xl font-bold mb-6">Products</h1>
-          <div className="flex justify-center items-center h-64">
-            <p>Loading products...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
 
   if (error) {
     return (
