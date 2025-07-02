@@ -23,17 +23,17 @@ export default function Sidebar() {
         <h2 className="text-2xl font-bold mb-6">I-Kart</h2>
         <ul className="space-y-4">
           {sidebarItems.map(({ label, href }) => (
-            <li key={href}>
-              <Link
-                href={href}
-                className={clsx(
-                  'block p-2 rounded cursor-pointer hover:bg-gray-200',
-                  pathname === href && 'bg-gray-200 font-semibold'
-                )}
-              >
-                {label}
-              </Link>
-            </li>
+            <Link
+              href={href}
+              className={clsx(
+                'block p-2 rounded cursor-pointer hover:bg-gray-200',
+                pathname === href && 'bg-gray-200 font-semibold'
+              )}
+            >
+              <li key={href}>
+                  {label}
+              </li>
+            </Link>
           ))}
         </ul>
       </div>

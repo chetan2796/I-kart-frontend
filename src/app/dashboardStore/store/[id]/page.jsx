@@ -36,27 +36,33 @@ export default function StoreShowPage() {
       }
     };
 
-    const fetchStoreProducts = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:3000/store-products/${id}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        if (!res.ok) throw new Error('Failed to fetch store products');
-        const data = await res.json();
-        setStoreProducts(data);
-      }
-      catch (error) {
-        console.error('Error fetching store products:', error);
-      }
-    };
-
-    if (id) fetchStore();
-    if (id) fetchStoreProducts();
+    if (!id) return;
+    setLoading(true);
+    Promise.all([fetchStore(), fetchStoreProducts()]).finally(() => setLoading(false));
   }, [id]);
+
+  
+  const fetchStoreProducts = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:3000/store-products/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (res.status === 404) {
+        setStoreProducts([]);
+        return;
+      }
+      if (!res.ok) throw new Error('Failed to fetch store products');
+      const data = await res.json();
+      setStoreProducts(data);
+    } catch (error) {
+      console.error('Error fetching store products:', error);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -105,11 +111,31 @@ export default function StoreShowPage() {
 
       if (!res.ok) throw new Error('Failed to add products');
 
-      alert('Products added successfully!');
       setShowModal(false);
       setSelectedProductIds([]);
+      await fetchStoreProducts();
     } catch (error) {
       console.error('Error adding products:', error);
+    }
+  };
+
+  const handleRemoveProduct = async (productId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:3000/store-products/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ productId }),
+      });
+
+      if (!res.ok) throw new Error('Failed to delete product from store');
+
+      await fetchStoreProducts();
+    } catch (error) {
+      console.error('Error deleting product:', error);
     }
   };
 
@@ -124,9 +150,9 @@ export default function StoreShowPage() {
           <h1 className="text-3xl font-bold">{store.name}</h1>
           <button
             onClick={handleAddProductClick}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="bg-gray-200 text-black px-4 py-2 rounded mb-6 hover:bg-gray-300 transition cursor-pointer"
           >
-            + Add Product
+            Add Product
           </button>
         </div>
 
@@ -140,21 +166,23 @@ export default function StoreShowPage() {
           />
         </div>
 
-        <p className="text-xl text-gray-700">Price: ₹ {store.price}</p>
-        
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {storeProducts.map((product) => (
             <div
               key={product.id}
-              className="bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden"
+              className="relative group bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden"
             >
+              <button
+                onClick={() => handleRemoveProduct(product.id)}
+                className="absolute top-2 right-2 text-red-500 bg-white rounded-full p-1 shadow opacity-0 group-hover:opacity-100 transition"
+                title="Remove product"
+              >
+                ❌
+              </button>
+
               <div className="p-4">
-                <h2 className="text-lg font-semibold text-gray-800">
-                  {product.name}
-                </h2>
-                <p className="text-gray-600 mt-1">
-                  {product.description}
-                </p>
+                <h2 className="text-lg font-semibold text-gray-800">{product.name}</h2>
+                <p className="text-gray-600 mt-1">{product.description}</p>
                 <p className="text-blue-600 font-bold text-md mt-2">
                   ₹ {(product.priceCents / 100).toFixed(2)}
                 </p>
@@ -175,7 +203,9 @@ export default function StoreShowPage() {
             <h2 className="text-xl font-semibold mb-4">Select Products</h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 max-h-80 overflow-y-auto">
-              {products.map((product) => (
+              {products
+                .filter((product) => !storeProducts.some((storeProduct) => storeProduct.id === product.id))
+                .map((product) => (
                 <div
                   key={product.id}
                   className={`border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition relative cursor-pointer ${

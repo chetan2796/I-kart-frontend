@@ -50,13 +50,13 @@ export default function StorePage() {
       <div className="flex min-h-screen">
         <Sidebar />
         <main className="flex-1 bg-gray-100 p-4">
+          <h1 className="text-3xl font-bold mb-6 text-gray-800">My Store</h1>
           <Link href="/dashboardStore/store/newStore">
-            <button className="mt-4 bg-blue-600 text-white py-1 px-4 rounded hover:bg-blue-700 transition">
-              Add New Store
+            <button className="bg-gray-200 text-black px-4 py-2 rounded mb-6 hover:bg-gray-300 transition cursor-pointer">
+              New Store
             </button>
           </Link>
 
-          <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">My Store</h1>
 
           {loading ? (
             <p className="text-center text-gray-600">Loading stores...</p>
