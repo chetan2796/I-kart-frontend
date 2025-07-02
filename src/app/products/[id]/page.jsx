@@ -5,6 +5,8 @@ import Sidebar from "../../components/Sidebar";
 import RequireAuth from "../../components/RequireAuth";
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+
 
 export default function ProductPage({ params }) {
   const { id } = React.use(params);
@@ -58,7 +60,15 @@ export default function ProductPage({ params }) {
       <div className="flex min-h-screen">
         <Sidebar />
         <div className="flex items-center justify-center flex-1 bg-gray-50 p-6">
-          <div className="max-w-sm w-full border border-gray-200 bg-white rounded-lg shadow overflow-hidden">
+          <div className="max-w-sm w-full border border-gray-200 bg-white rounded-lg shadow overflow-hidden relative">
+            {/* Edit Button (Top-Right Corner) */}
+            <Link 
+              href={`/products/${id}/edit`}
+              className="absolute top-2 right-2 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition-colors z-10"
+            >
+              Edit
+            </Link>
+            
             <div className="h-72 w-full overflow-hidden">
               <img
                 src={product.productImages?.[0]?.url}

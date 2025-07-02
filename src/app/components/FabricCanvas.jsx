@@ -1,14 +1,14 @@
-'use client';
-import { useState, useEffect, useRef } from 'react';
-import Head from 'next/head';
+"use client";
+import { useState, useEffect, useRef } from "react";
+import Head from "next/head";
 
 export default function DesignEditor() {
   const canvasRef = useRef(null);
   const [canvas, setCanvas] = useState(null);
   const [fabric, setFabric] = useState(null);
-  const [color, setColor] = useState('#000000');
+  const [color, setColor] = useState("#000000");
   const [recentImages, setRecentImages] = useState([]);
-  const [productType, setProductType] = useState('tshirt');
+  const [productType, setProductType] = useState("tshirt");
   const formRef = useRef(null);
 
   const printAreas = {
@@ -17,13 +17,13 @@ export default function DesignEditor() {
       height: 200,
       left: 280,
       top: 150,
-      fill: 'rgba(255,255,255,0)',
-      stroke: 'red',
+      fill: "rgba(255,255,255,0)",
+      stroke: "red",
       strokeWidth: 2,
       strokeDashArray: [5, 5],
       selectable: false,
       evented: false,
-      hoverCursor: 'default',
+      hoverCursor: "default",
       zIndex: 99,
     },
     mug: {
@@ -31,8 +31,8 @@ export default function DesignEditor() {
       height: 120,
       left: 300,
       top: 240,
-      fill: 'rgba(255,255,255,0)',
-      stroke: 'blue',
+      fill: "rgba(255,255,255,0)",
+      stroke: "blue",
       strokeWidth: 2,
       strokeDashArray: [5, 5],
       zIndex: 99,
@@ -42,8 +42,8 @@ export default function DesignEditor() {
       height: 300,
       left: 325,
       top: 150,
-      fill: 'rgba(255,255,255,0)',
-      stroke: 'green',
+      fill: "rgba(255,255,255,0)",
+      stroke: "green",
       strokeWidth: 2,
       strokeDashArray: [5, 5],
       zIndex: 99,
@@ -55,8 +55,9 @@ export default function DesignEditor() {
     const loadFabric = async () => {
       if (!window.fabric) {
         await new Promise((resolve) => {
-          const script = document.createElement('script');
-          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js';
+          const script = document.createElement("script");
+          script.src =
+            "https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js";
           script.onload = resolve;
           document.head.appendChild(script);
         });
@@ -70,7 +71,7 @@ export default function DesignEditor() {
   useEffect(() => {
     if (fabric && canvasRef.current) {
       const newCanvas = new fabric.Canvas(canvasRef.current, {
-        backgroundColor: '#ffffff',
+        backgroundColor: "#ffffff",
         selection: true,
         preserveObjectStacking: true,
       });
@@ -84,7 +85,7 @@ export default function DesignEditor() {
 
   // Load recent images
   useEffect(() => {
-    const cached = localStorage.getItem('recentImages');
+    const cached = localStorage.getItem("recentImages");
     if (cached) {
       setRecentImages(JSON.parse(cached));
     }
@@ -98,39 +99,50 @@ export default function DesignEditor() {
 
   const loadBaseProductImage = (canvasInstance) => {
     // Using a placeholder image; replace with your carousel logic if needed
-    const imageSrc = '/images/tshirt.png'; // Adjust path as needed
-    fabric.Image.fromURL(imageSrc, (img) => {
-      img.scaleToWidth(canvasInstance.width * 0.9);
-      img.set({
-        left: canvasInstance.width / 2,
-        top: canvasInstance.height / 2,
-        originX: 'center',
-        originY: 'center',
-        selectable: false,
-        hasControls: false,
-        hasBorders: false,
-        name: 'base-image',
-        lockMovementX: true,
-        lockMovementY: true,
-        lockRotation: true,
-        lockScalingX: true,
-        lockScalingY: true,
-      });
-      canvasInstance.add(img);
-      canvasInstance.sendToBack(img);
-    }, { crossOrigin: 'anonymous' });
+    const imageSrc = "/images/tshirt.png"; // Adjust path as needed
+    fabric.Image.fromURL(
+      imageSrc,
+      (img) => {
+        img.scaleToWidth(canvasInstance.width * 0.9);
+        img.set({
+          left: canvasInstance.width / 2,
+          top: canvasInstance.height / 2,
+          originX: "center",
+          originY: "center",
+          selectable: false,
+          hasControls: false,
+          hasBorders: false,
+          name: "base-image",
+          lockMovementX: true,
+          lockMovementY: true,
+          lockRotation: true,
+          lockScalingX: true,
+          lockScalingY: true,
+        });
+        canvasInstance.add(img);
+        canvasInstance.sendToBack(img);
+      },
+      { crossOrigin: "anonymous" }
+    );
   };
 
+  // Enhanced print area setup with visual feedback
   const setupPrintArea = (canvasInstance, type, showBorder = true) => {
-    const existingArea = canvasInstance.getObjects().find((obj) => obj.name === 'print-area');
+    const existingArea = canvasInstance
+      .getObjects()
+      .find((obj) => obj.name === "print-area");
     if (existingArea) {
       canvasInstance.remove(existingArea);
     }
+
     if (printAreas[type]) {
       const config = printAreas[type];
+
+      // Add semi-transparent fill for better visual guidance
       const area = new fabric.Rect({
-        name: 'print-area',
+        name: "print-area",
         ...config,
+        fill: "rgba(200, 200, 255, 0.2)", // More visible than fully transparent
         selectable: false,
         evented: false,
         hasControls: false,
@@ -142,44 +154,61 @@ export default function DesignEditor() {
         lockScalingY: true,
         visible: showBorder,
       });
+
       canvasInstance.add(area);
       area.sendToBack();
+
+      // Add text label
+      const label = new fabric.Text("Customization Area", {
+        left: config.left,
+        top: config.top - 20,
+        fontSize: 14,
+        fill: config.stroke,
+        originX: "center",
+        selectable: false,
+        evented: false,
+      });
+      canvasInstance.add(label);
+
       canvasInstance.renderAll();
     }
   };
-
   const setupObjectControls = (canvasInstance) => {
-    canvasInstance.on('selection:created', () => addDeleteControl(canvasInstance));
-    canvasInstance.on('selection:updated', () => addDeleteControl(canvasInstance));
-    canvasInstance.on('selection:cleared', removeDeleteControl);
-    canvasInstance.on('object:moving', () => {
-      const warning = document.querySelector('.print-area-warning');
+    canvasInstance.on("selection:created", () =>
+      addDeleteControl(canvasInstance)
+    );
+    canvasInstance.on("selection:updated", () =>
+      addDeleteControl(canvasInstance)
+    );
+    canvasInstance.on("selection:cleared", removeDeleteControl);
+    canvasInstance.on("object:moving", () => {
+      const warning = document.querySelector(".print-area-warning");
       if (!validateDesignPosition(canvasInstance)) {
         if (!warning) {
-          const warnEl = document.createElement('div');
-          warnEl.className = 'print-area-warning';
-          warnEl.textContent = 'Design is outside printable area';
+          const warnEl = document.createElement("div");
+          warnEl.className = "print-area-warning";
+          warnEl.textContent = "Design is outside printable area";
           canvasInstance.wrapperEl.appendChild(warnEl);
         }
       } else {
         if (warning) warning.remove();
       }
     });
-    canvasInstance.on('object:modified', () => {
-      const warning = document.querySelector('.print-area-warning');
+    canvasInstance.on("object:modified", () => {
+      const warning = document.querySelector(".print-area-warning");
       if (warning) warning.remove();
     });
   };
 
   const addDeleteControl = (canvasInstance) => {
     const activeObject = canvasInstance.getActiveObject();
-    if (activeObject && !activeObject.name.includes('base')) {
+    if (activeObject && !activeObject.name.includes("base")) {
       addDeleteButtonToObject(canvasInstance, activeObject);
     }
   };
 
   const removeDeleteControl = () => {
-    const deleteBtn = document.querySelector('.canvas-delete-btn');
+    const deleteBtn = document.querySelector(".canvas-delete-btn");
     if (deleteBtn) {
       deleteBtn.remove();
     }
@@ -191,25 +220,25 @@ export default function DesignEditor() {
     const objTop = obj.top;
     const objWidth = obj.getScaledWidth();
     const objHeight = obj.getScaledHeight();
-    const deleteBtn = document.createElement('div');
-    deleteBtn.className = 'canvas-delete-btn';
-    deleteBtn.innerHTML = '✕';
-    deleteBtn.style.position = 'absolute';
+    const deleteBtn = document.createElement("div");
+    deleteBtn.className = "canvas-delete-btn";
+    deleteBtn.innerHTML = "✕";
+    deleteBtn.style.position = "absolute";
     deleteBtn.style.left = `${objLeft + objWidth / 2 - 10}px`;
     deleteBtn.style.top = `${objTop - objHeight / 2 - 15}px`;
-    deleteBtn.style.width = '20px';
-    deleteBtn.style.height = '20px';
-    deleteBtn.style.backgroundColor = 'white';
-    deleteBtn.style.borderRadius = '50%';
-    deleteBtn.style.display = 'flex';
-    deleteBtn.style.alignItems = 'center';
-    deleteBtn.style.justifyContent = 'center';
-    deleteBtn.style.cursor = 'pointer';
-    deleteBtn.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-    deleteBtn.style.zIndex = '1000';
-    deleteBtn.style.color = 'red';
-    deleteBtn.style.fontWeight = 'bold';
-    deleteBtn.addEventListener('click', (e) => {
+    deleteBtn.style.width = "20px";
+    deleteBtn.style.height = "20px";
+    deleteBtn.style.backgroundColor = "white";
+    deleteBtn.style.borderRadius = "50%";
+    deleteBtn.style.display = "flex";
+    deleteBtn.style.alignItems = "center";
+    deleteBtn.style.justifyContent = "center";
+    deleteBtn.style.cursor = "pointer";
+    deleteBtn.style.boxShadow = "0 2px 5px rgba(0,0,0,0.2)";
+    deleteBtn.style.zIndex = "1000";
+    deleteBtn.style.color = "red";
+    deleteBtn.style.fontWeight = "bold";
+    deleteBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       canvasInstance.remove(obj);
       canvasInstance.discardActiveObject();
@@ -217,13 +246,13 @@ export default function DesignEditor() {
       deleteBtn.remove();
     });
     canvasInstance.wrapperEl.appendChild(deleteBtn);
-    obj.on('moving', () => {
+    obj.on("moving", () => {
       const newLeft = obj.left;
       const newTop = obj.top;
       deleteBtn.style.left = `${newLeft + objWidth / 2 - 10}px`;
       deleteBtn.style.top = `${newTop - objHeight / 2 - 15}px`;
     });
-    obj.on('removed', () => {
+    obj.on("removed", () => {
       deleteBtn.remove();
     });
   };
@@ -235,17 +264,19 @@ export default function DesignEditor() {
       top: canvas.height / 2,
       fontSize: 40,
       fill: color,
-      fontFamily: 'Arial, sans-serif',
+      fontFamily: "Arial, sans-serif",
       hasControls: true,
-      originX: 'center',
-      originY: 'center',
-      name: 'emoji',
+      originX: "center",
+      originY: "center",
+      name: "emoji",
     });
     canvas.add(text);
     canvas.setActiveObject(text);
     canvas.renderAll();
     // Close modal (assuming Bootstrap is handling it)
-    const modal = window.bootstrap.Modal.getInstance(document.getElementById('emojiModal'));
+    const modal = window.bootstrap.Modal.getInstance(
+      document.getElementById("emojiModal")
+    );
     if (modal) modal.hide();
   };
 
@@ -255,26 +286,30 @@ export default function DesignEditor() {
     const reader = new FileReader();
     reader.onload = (f) => {
       cacheImage(file.name, file.type, file.size, f.target.result);
-      fabric.Image.fromURL(f.target.result, (img) => {
-        img.set({
-          left: canvas.width / 2,
-          top: canvas.height / 2,
-          originX: 'center',
-          originY: 'center',
-          scaleX: 0.5,
-          scaleY: 0.5,
-          hasRotatingPoint: true,
-          cornerSize: 12,
-          transparentCorners: false,
-          padding: 10,
-          cornerColor: '#4a89dc',
-          borderColor: '#4a89dc',
-          name: 'custom-image',
-        });
-        canvas.add(img);
-        canvas.setActiveObject(img);
-        canvas.renderAll();
-      }, { crossOrigin: 'anonymous' });
+      fabric.Image.fromURL(
+        f.target.result,
+        (img) => {
+          img.set({
+            left: canvas.width / 2,
+            top: canvas.height / 2,
+            originX: "center",
+            originY: "center",
+            scaleX: 0.5,
+            scaleY: 0.5,
+            hasRotatingPoint: true,
+            cornerSize: 12,
+            transparentCorners: false,
+            padding: 10,
+            cornerColor: "#4a89dc",
+            borderColor: "#4a89dc",
+            name: "custom-image",
+          });
+          canvas.add(img);
+          canvas.setActiveObject(img);
+          canvas.renderAll();
+        },
+        { crossOrigin: "anonymous" }
+      );
     };
     reader.readAsDataURL(file);
   };
@@ -283,30 +318,44 @@ export default function DesignEditor() {
     const updatedImages = [...recentImages];
     const existingIndex = updatedImages.findIndex((img) => img.name === name);
     if (existingIndex >= 0) {
-      updatedImages[existingIndex] = { name, type, size, data: dataURL, lastModified: Date.now() };
+      updatedImages[existingIndex] = {
+        name,
+        type,
+        size,
+        data: dataURL,
+        lastModified: Date.now(),
+      };
     } else {
-      updatedImages.push({ name, type, size, data: dataURL, lastModified: Date.now() });
+      updatedImages.push({
+        name,
+        type,
+        size,
+        data: dataURL,
+        lastModified: Date.now(),
+      });
     }
-    const sorted = updatedImages.sort((a, b) => b.lastModified - a.lastModified).slice(0, 5);
+    const sorted = updatedImages
+      .sort((a, b) => b.lastModified - a.lastModified)
+      .slice(0, 5);
     setRecentImages(sorted);
-    localStorage.setItem('recentImages', JSON.stringify(sorted));
+    localStorage.setItem("recentImages", JSON.stringify(sorted));
   };
 
   const addText = () => {
     if (!canvas) return;
-    const text = new fabric.Textbox('Your Text Here', {
+    const text = new fabric.Textbox("Your Text Here", {
       left: canvas.width / 2,
       top: canvas.height / 2,
       width: 150,
       fontSize: 20,
       fill: color,
-      fontFamily: 'Arial',
+      fontFamily: "Arial",
       hasControls: true,
       padding: 5,
-      backgroundColor: 'rgba(255,255,255,0.7)',
-      originX: 'center',
-      originY: 'center',
-      name: 'custom-text',
+      backgroundColor: "rgba(255,255,255,0.7)",
+      originX: "center",
+      originY: "center",
+      name: "custom-text",
     });
     canvas.add(text);
     canvas.setActiveObject(text);
@@ -316,26 +365,28 @@ export default function DesignEditor() {
   const updateTextColor = (e) => {
     setColor(e.target.value);
     const activeObject = canvas?.getActiveObject();
-    if (activeObject && activeObject.type === 'textbox') {
-      activeObject.set('fill', e.target.value);
+    if (activeObject && activeObject.type === "textbox") {
+      activeObject.set("fill", e.target.value);
       canvas.renderAll();
     }
   };
 
   const deleteSelected = () => {
     const activeObject = canvas?.getActiveObject();
-    if (activeObject && !activeObject.name.includes('base')) {
+    if (activeObject && !activeObject.name.includes("base")) {
       canvas.remove(activeObject);
       canvas.renderAll();
     }
   };
 
   const validateDesignPosition = (canvasInstance) => {
-    const printArea = canvasInstance.getObjects().find((obj) => obj.name === 'print-area');
+    const printArea = canvasInstance
+      .getObjects()
+      .find((obj) => obj.name === "print-area");
     if (!printArea) return true;
-    const customObjects = canvasInstance.getObjects().filter((obj) =>
-      obj.name && obj.name.includes('custom')
-    );
+    const customObjects = canvasInstance
+      .getObjects()
+      .filter((obj) => obj.name && obj.name.includes("custom"));
     return customObjects.every((obj) => {
       const objBounds = {
         left: obj.left - (obj.width * obj.scaleX) / 2,
@@ -361,25 +412,31 @@ export default function DesignEditor() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!canvas) return;
-    const customObjects = canvas.getObjects().filter((obj) =>
-      obj.name && obj.name.includes('custom')
-    );
+    const customObjects = canvas
+      .getObjects()
+      .filter((obj) => obj.name && obj.name.includes("custom"));
     if (customObjects.length === 0) {
-      alert('Please add at least one customization (text or image) before saving!');
+      alert(
+        "Please add at least one customization (text or image) before saving!"
+      );
       return;
     }
     if (!validateDesignPosition(canvas)) {
-      alert('Some design elements are outside the printable area. Please adjust them before saving.');
+      alert(
+        "Some design elements are outside the printable area. Please adjust them before saving."
+      );
       return;
     }
-    const printArea = canvas.getObjects().find((obj) => obj.name === 'print-area');
+    const printArea = canvas
+      .getObjects()
+      .find((obj) => obj.name === "print-area");
     if (printArea) {
-      printArea.set({ stroke: 'transparent', fill: 'transparent' });
+      printArea.set({ stroke: "transparent", fill: "transparent" });
       canvas.renderAll();
     }
     setTimeout(() => {
-      const dataURL = canvas.toDataURL({ format: 'png', quality: 1.0 });
-      console.log('Design saved:', dataURL); // Replace with actual form submission
+      const dataURL = canvas.toDataURL({ format: "png", quality: 1.0 });
+      console.log("Design saved:", dataURL); // Replace with actual form submission
       // Optionally, reset the print area border
       setupPrintArea(canvas, productType);
     }, 100);
@@ -389,9 +446,12 @@ export default function DesignEditor() {
     if (confirm(`Are you sure you want to delete ${fileName}?`)) {
       const updatedImages = recentImages.filter((img) => img.name !== fileName);
       setRecentImages(updatedImages);
-      localStorage.setItem('recentImages', JSON.stringify(updatedImages));
-      canvas?.getObjects()
-        .filter((obj) => obj.name === 'custom-image' && obj.src?.includes(fileName))
+      localStorage.setItem("recentImages", JSON.stringify(updatedImages));
+      canvas
+        ?.getObjects()
+        .filter(
+          (obj) => obj.name === "custom-image" && obj.src?.includes(fileName)
+        )
         .forEach((obj) => canvas.remove(obj));
       canvas?.renderAll();
     }
@@ -401,18 +461,31 @@ export default function DesignEditor() {
     <>
       <Head>
         <title>Design Editor</title>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" async />
-        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+          async
+        />
+        <link
+          href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+          rel="stylesheet"
+        />
       </Head>
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Design Your Product</h1>
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
-            <canvas ref={canvasRef} width="800" height="600" className="border border-gray-300"></canvas>
+            <canvas
+              ref={canvasRef}
+              width="800"
+              height="600"
+              className="border border-gray-300"
+            ></canvas>
           </div>
           <div className="w-full md:w-1/3">
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Product Type</label>
+              <label className="block text-sm font-medium mb-1">
+                Product Type
+              </label>
               <select
                 value={productType}
                 onChange={(e) => setProductType(e.target.value)}
@@ -424,7 +497,9 @@ export default function DesignEditor() {
               </select>
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Text Color</label>
+              <label className="block text-sm font-medium mb-1">
+                Text Color
+              </label>
               <input
                 type="color"
                 value={color}
@@ -440,7 +515,7 @@ export default function DesignEditor() {
                 Add Text
               </button>
               <button
-                onClick={() => document.getElementById('fileUpload').click()}
+                onClick={() => document.getElementById("fileUpload").click()}
                 className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
               >
                 Upload Image
@@ -487,30 +562,38 @@ export default function DesignEditor() {
                       alt={file.name}
                       className="w-full h-20 object-cover rounded cursor-pointer"
                       onClick={() => {
-                        fabric.Image.fromURL(file.data, (img) => {
-                          img.set({
-                            left: canvas?.width / 2,
-                            top: canvas?.height / 2,
-                            originX: 'center',
-                            originY: 'center',
-                            scaleX: 0.5,
-                            scaleY: 0.5,
-                            hasRotatingPoint: true,
-                            cornerSize: 12,
-                            transparentCorners: false,
-                            padding: 10,
-                            cornerColor: '#4a89dc',
-                            borderColor: '#4a89dc',
-                            name: 'custom-image',
-                            src: file.data,
-                          });
-                          canvas?.add(img);
-                          canvas?.setActiveObject(img);
-                          canvas?.renderAll();
-                        }, { crossOrigin: 'anonymous' });
+                        fabric.Image.fromURL(
+                          file.data,
+                          (img) => {
+                            img.set({
+                              left: canvas?.width / 2,
+                              top: canvas?.height / 2,
+                              originX: "center",
+                              originY: "center",
+                              scaleX: 0.5,
+                              scaleY: 0.5,
+                              hasRotatingPoint: true,
+                              cornerSize: 12,
+                              transparentCorners: false,
+                              padding: 10,
+                              cornerColor: "#4a89dc",
+                              borderColor: "#4a89dc",
+                              name: "custom-image",
+                              src: file.data,
+                            });
+                            canvas?.add(img);
+                            canvas?.setActiveObject(img);
+                            canvas?.renderAll();
+                          },
+                          { crossOrigin: "anonymous" }
+                        );
                       }}
                     />
-                    <div className="text-xs truncate">{file.name.length > 15 ? file.name.substring(0, 12) + '...' : file.name}</div>
+                    <div className="text-xs truncate">
+                      {file.name.length > 15
+                        ? file.name.substring(0, 12) + "..."
+                        : file.name}
+                    </div>
                     <button
                       onClick={() => deleteCachedImage(file.name)}
                       className="absolute top-0 right-0 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center"
@@ -524,12 +607,25 @@ export default function DesignEditor() {
           </div>
         </div>
       </div>
-      <div className="modal fade" id="emojiModal" tabIndex="-1" aria-labelledby="emojiModalLabel" aria-hidden="true">
+      <div
+        className="modal fade"
+        id="emojiModal"
+        tabIndex="-1"
+        aria-labelledby="emojiModalLabel"
+        aria-hidden="true"
+      >
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title" id="emojiModalLabel">Select an Emoji</h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <h5 className="modal-title" id="emojiModalLabel">
+                Select an Emoji
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
             </div>
             <div className="modal-body">
               <input
@@ -539,14 +635,20 @@ export default function DesignEditor() {
                 className="w-full p-2 border rounded mb-2"
                 onInput={(e) => {
                   const searchTerm = e.target.value.toLowerCase();
-                  document.querySelectorAll('.emoji-option').forEach((emojiEl) => {
-                    const emojiName = emojiEl.querySelector('.emoji-name')?.textContent.toLowerCase();
-                    emojiEl.style.display = emojiName?.includes(searchTerm) ? 'block' : 'none';
-                  });
+                  document
+                    .querySelectorAll(".emoji-option")
+                    .forEach((emojiEl) => {
+                      const emojiName = emojiEl
+                        .querySelector(".emoji-name")
+                        ?.textContent.toLowerCase();
+                      emojiEl.style.display = emojiName?.includes(searchTerm)
+                        ? "block"
+                        : "none";
+                    });
                 }}
               />
               <div className="grid grid-cols-4 gap-2">
-                {['😊', '👍', '❤️', '🎉'].map((emoji) => (
+                {["😊", "👍", "❤️", "🎉"].map((emoji) => (
                   <div
                     key={emoji}
                     className="emoji-option cursor-pointer p-2 hover:bg-gray-100"
