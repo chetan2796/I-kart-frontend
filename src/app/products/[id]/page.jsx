@@ -3,10 +3,32 @@
 import React, { useEffect, useState } from 'react';
 import Sidebar from "../../components/Sidebar";
 import RequireAuth from "../../components/RequireAuth";
+import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 
 export default function ProductPage({ params }) {
   const { id } = React.use(params);
   const [product, setProduct] = useState(null);
+  const router = useRouter();
+
+  const handleDeleteProduct = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/products/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!res.ok) throw new Error('Failed to delete product');
+      const data = await res.json();
+      toast.success('Product deleted');
+      router.push('/dashboardSeller');
+    } catch (error) {
+      toast.error('Error deleting product:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -61,6 +83,17 @@ export default function ProductPage({ params }) {
               </div>
               <div className="text-2xl font-bold text-green-600 mb-4">${product.priceCents / 100}</div>
               <button className="w-full bg-gray-900 py-2 text-white rounded hover:bg-gray-700">Add to store</button>
+              <a href={`/products/${id}/edit`}>
+                <button className="w-full bg-blue-600 py-2 text-white rounded hover:bg-blue-700 mt-2 cursor-pointer">
+                  Edit Product
+                </button>
+              </a>
+              <button
+                onClick={handleDeleteProduct}
+                className="w-full bg-red-600 py-2 text-white rounded hover:bg-red-700 mt-2 cursor-pointer"
+              >
+                Delete Product
+              </button>
             </div>
           </div>
         </div>

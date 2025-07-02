@@ -54,7 +54,7 @@ export default function editProducts({ params }) {
     try {
       const authToken = localStorage.getItem('token')
       setAuthToken(authToken)
-      const res = await fetch(`http://localhost:3000/catalogs/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/catalogs/${id}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
           'Content-Type': 'application/json',
