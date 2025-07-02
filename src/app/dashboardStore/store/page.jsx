@@ -51,8 +51,8 @@ export default function StorePage() {
         <Sidebar />
         <main className="flex-1 bg-gray-100 p-4">
           <Link href="/dashboardStore/store/newStore">
-            <button className="mt-4 bg-blue-600 text-white py-1 px-4 rounded hover:bg-blue-700 transition">
-              Add New Store
+            <button className="bg-gray-200 text-black px-4 py-2 rounded mb-6 hover:bg-gray-300 transition cursor-pointer">
+              New Store
             </button>
           </Link>
 
