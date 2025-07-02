@@ -1,5 +1,6 @@
-export const handleSignout = async (router) => {
+export const handleSignout = async (router, setLoading) => {
   try {
+    setLoading?.(true);
     const token = localStorage.getItem("token");
 
     if (!token) {
@@ -23,5 +24,7 @@ export const handleSignout = async (router) => {
     router.push("/user/login");
   } catch (error) {
     console.error("Error during signout:", error);
+  } finally {
+    setLoading?.(false);
   }
 };

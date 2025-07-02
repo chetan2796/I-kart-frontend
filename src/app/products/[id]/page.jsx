@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import Sidebar from "../../components/Sidebar";
 import RequireAuth from "../../components/RequireAuth";
 
-
 export default function ProductPage({ params }) {
   const { id } = React.use(params);
   const [product, setProduct] = useState(null);

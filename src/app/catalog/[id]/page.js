@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
+import LoadingButton from '../../components/LoadingButton';
 
 export default function editProducts({ params }) {
   const { id } = React.use(params);
@@ -24,8 +25,9 @@ export default function editProducts({ params }) {
     description: "",
     price: "",
     variants: {},
-    designData: "", // for hidden input, if you need to add data programmatically
+    designData: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -454,11 +456,11 @@ export default function editProducts({ params }) {
       obj.name && obj.name.includes('custom')
     );
     if (customObjects.length === 0) {
-      alert('Please add at least one customization (text or image) before saving!');
+      toast.error('Please customize your design before saving!');
       return;
     }
     if (!validateDesignPosition(canvas)) {
-      alert('Some design elements are outside the printable area. Please adjust them before saving.');
+      toast.error('Please ensure all design elements are within the printable area.');
       return;
     }
     const printArea = canvas.getObjects().find((obj) => obj.name === 'print-area');
@@ -468,30 +470,18 @@ export default function editProducts({ params }) {
     }
     let dataURL;
     dataURL = canvas.toDataURL({ format: 'png', quality: 1.0 });
-    console.log('Design saved:', dataURL); // Replace with actual form submission
-    alert('Design saved')
     setupPrintArea(canvas, productType);
     setSavedImage(dataURL)
-    const payload = {
-      name: form.name,
-      description: form.description,
-      price: parseFloat(form.price),
-      variants: form.variants,
-      designData: form.designData,
-    };
-    console.log("payload==>>", payload)
-    console.log("dataURL==>>", dataURL)
-    console.log("saved iamge==>>", savedImage)
     const compressedImage = await compressBase64Image(dataURL, 800, 0.6);
-    console.log("CompressedImage image:", compressedImage);
+    const priceCents = Math.round(parseFloat(form.price) * 100);
     let modifiedProduct = {
-      "name": catalog.name,
-      "description": payload.description,
-      "priceCents": payload.price || 100,
+      "name": form.name,
+      "description": form.description,
+      "priceCents": priceCents,
       "priceCurrency": "USD",
-      "slug": generateRandomSlug(catalog.name),
-      "catalogId": printArea.catalogId || 1,
-      "productVariants": Object.entries(payload.variants).map(([optionName, optionValues]) => ({
+      "slug": generateRandomSlug(form.name),
+      "catalogId": parseInt(id),
+      "productVariants": Object.entries(form.variants).map(([optionName, optionValues]) => ({
         optionName,
         optionValues,
       })),
@@ -502,6 +492,7 @@ export default function editProducts({ params }) {
         }
       ]
     }
+    setLoading(true);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/products`, {
         method: "POST",
@@ -517,13 +508,15 @@ export default function editProducts({ params }) {
       if (response.ok) {
         localStorage.setItem("email", form.email);
         localStorage.setItem("isLoggedIn", "true");
+        toast.success("Product saved successfully!");
         router.push('/dashboardSeller');
       } else {
-        alert(data.message || "error occured. Try again.");
+        toast.error(data.message || "Error occurred while saving the product. Please try again.");
       }
     } catch (error) {
-      console.error("login error:", error);
-      alert("Something went wrong. Please try again.");
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -649,7 +642,7 @@ export default function editProducts({ params }) {
                 <div className="grid grid-cols-1 gap-3">
                   <button
                     onClick={() => document.getElementById('fileUpload').click()}
-                    className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg transition-colors text-sm"
+                    className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg transition-colors text-sm cursor-pointer"
                   >
                     <i className="fas fa-image"></i>
                     Upload Image
@@ -718,7 +711,7 @@ export default function editProducts({ params }) {
                     {/* Variants Section */}
                     <div className="mb-4">
                       <h4 className="text-sm font-medium text-gray-700 mb-2">
-                        Product Variants
+                        {Object.entries(catalogVariants).length > 0 && 'Product Variants'}
                       </h4>
                       {Object.entries(catalogVariants).map(([variantName, options]) => (
                         <div key={variantName} className="border-b pb-3">
@@ -752,12 +745,9 @@ export default function editProducts({ params }) {
                     />
 
                     {/* Submit Button */}
-                    <button
-                      type="submit"
-                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-                    >
+                    <LoadingButton loading={loading} type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors cursor-pointer">
                       Create Product
-                    </button>
+                    </LoadingButton>
                   </div>
                 </form>
 
