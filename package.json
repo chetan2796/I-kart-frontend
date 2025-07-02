@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
@@ -24,10 +26,17 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@types/jest": "^30.0.0",
     "@types/node": "24.0.3",
     "@types/react": "19.1.8",
     "eslint": "^9",
     "eslint-config-next": "15.3.3",
-    "tailwindcss": "^4"
+    "jest": "^30.0.3",
+    "jest-environment-jsdom": "^30.0.2",
+    "tailwindcss": "^4",
+    "ts-node": "^10.9.2"
   }
 }
