@@ -49,7 +49,7 @@ export default function StorePage() {
     <RequireAuth>
       <div className="flex min-h-screen">
         <Sidebar />
-        <main className="flex-1 bg-gray-100 p-8">
+        <main className="flex-1 bg-gray-100 p-4">
           <Link href="/dashboardStore/store/newStore">
             <button className="mt-4 bg-blue-600 text-white py-1 px-4 rounded hover:bg-blue-700 transition">
               Add New Store
@@ -61,7 +61,7 @@ export default function StorePage() {
           {loading ? (
             <p className="text-center text-gray-600">Loading stores...</p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
               {stores.map((store) => (
                 <Card
                 key={store.id}
