@@ -29,8 +29,9 @@ export default function Sidebar() {
                 'block p-2 rounded cursor-pointer hover:bg-gray-200',
                 pathname === href && 'bg-gray-200 font-semibold'
               )}
+              key={href}
             >
-              <li key={href}>
+              <li>
                   {label}
               </li>
             </Link>
