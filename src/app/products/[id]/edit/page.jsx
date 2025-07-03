@@ -61,20 +61,31 @@ export default function ProductEditPage({ params }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    const productPayload = {
+      name: product.name,
+      description: product.description,
+      priceCents: product.priceCents,
+      priceCurrency: product.priceCurrency,
+      slug: product.slug,
+      categoryId: product.categoryId,
+      productVariants: product.productVariants,
+      productImages: product.productImages.map(image => ({
+        url: image.url,
+        altText: image.altText
+      }))
+    }
 
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/products/${id}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(product),
+        body: JSON.stringify(productPayload),
       });
-      debugger
       if (!res.ok) throw new Error('Failed to update product');
-      
       router.push(`/products/${id}`);
     } catch (error) {
       console.error(error);

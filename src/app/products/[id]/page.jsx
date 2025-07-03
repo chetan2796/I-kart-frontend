@@ -7,7 +7,6 @@ import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-
 export default function ProductPage({ params }) {
   const { id } = React.use(params);
   const [product, setProduct] = useState(null);
@@ -61,14 +60,6 @@ export default function ProductPage({ params }) {
         <Sidebar />
         <div className="flex items-center justify-center flex-1 bg-gray-50 p-6">
           <div className="max-w-sm w-full border border-gray-200 bg-white rounded-lg shadow overflow-hidden relative">
-            {/* Edit Button (Top-Right Corner) */}
-            <Link 
-              href={`/products/${id}/edit`}
-              className="absolute top-2 right-2 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition-colors z-10"
-            >
-              Edit
-            </Link>
-            
             <div className="h-72 w-full overflow-hidden">
               <img
                 src={product.productImages?.[0]?.url}
@@ -93,11 +84,11 @@ export default function ProductPage({ params }) {
               </div>
               <div className="text-2xl font-bold text-green-600 mb-4">${product.priceCents / 100}</div>
               <button className="w-full bg-gray-900 py-2 text-white rounded hover:bg-gray-700">Add to store</button>
-              <a href={`/products/${id}/edit`}>
+              <Link href={`/products/${id}/edit`}>
                 <button className="w-full bg-blue-600 py-2 text-white rounded hover:bg-blue-700 mt-2 cursor-pointer">
                   Edit Product
                 </button>
-              </a>
+              </Link>
               <button
                 onClick={handleDeleteProduct}
                 className="w-full bg-red-600 py-2 text-white rounded hover:bg-red-700 mt-2 cursor-pointer"
