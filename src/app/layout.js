@@ -1,7 +1,7 @@
 'use client'
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter , usePathname } from "next/navigation";
 import { useRef, useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { makeStore } from './lib/store'
@@ -18,33 +18,38 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
 export default function RootLayout({ children }) {
-  const storeRef = useRef(undefined)
+  const storeRef = useRef(undefined);
   if (!storeRef.current) {
-    // Create the store instance the first time this renders
-    storeRef.current = makeStore()
+    storeRef.current = makeStore();
   }
-  const router = useRouter();
+
   const pathname = usePathname();
-  const [hideSidebar, setHideSidebar] = useState(false);
-  const publicRoutes = ['/user/login', '/user/signup', '/user/verifyOtp','/'];
+  const [hideSidebar, setHideSidebar] = useState(true); 
+
+  const publicRoutes = [
+    '/user/login',
+    '/user/signup',
+    '/user/verifyOtp',
+    '/',
+  ];
+
+  const numericPathRegex = /^\/[0-9]+(\/.*)?$/;
+
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const isPublic = publicRoutes.includes(pathname);
+    const isPublic = publicRoutes.includes(pathname) || numericPathRegex.test(pathname);
+    
     if ((!token || isTokenExpired(token)) && !isPublic) {
       localStorage.clear();
-      router.push('/user/login');
+      window.location.href = '/user/login'; 
+      return;
     }
-    const check404 = () => {
-      const h1 = document.querySelector('h1');
-      return h1?.textContent?.includes('404');
-    };
 
-    const is404 = check404();
-
-    const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(route));
-    setHideSidebar(isPublic || is404);
+    setHideSidebar(isPublic);
   }, [pathname]);
+
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
