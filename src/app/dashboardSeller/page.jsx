@@ -3,7 +3,7 @@ import FabricCanvas from "../components/FabricCanvas";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect } from "react";
-import Sidebar from "../components/Sidebar";
+//import Sidebar from "../components/Sidebar";
 import Card from "../components/Card";
 import RequireAuth from "../components/RequireAuth";
 import { useDispatch, useSelector } from "react-redux";
@@ -62,7 +62,6 @@ const DashboardSeller = () => {
     <RequireAuth>
       <div className="flex min-h-screen">
         {/* Sidebar */}
-        <Sidebar />
 
         {/* Main Content */}
         <div className="flex-1 px-4 py-6">

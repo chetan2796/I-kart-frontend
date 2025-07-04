@@ -1,6 +1,6 @@
 'use client';
 
-import Sidebar from "../components/Sidebar";
+//import Sidebar from "../components/Sidebar";
 import FabricCanvas from "../components/FabricCanvas";
 import Link from "next/link";
 import Image from "next/image";
@@ -45,13 +45,12 @@ const DashboardStore = () => {
     },
   ];
 
-  const cardClickHandler=()=>{
-    
+  const cardClickHandler = () => {
+
   }
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
 
       <div className="flex-1 container mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold mb-6">Products</h1>

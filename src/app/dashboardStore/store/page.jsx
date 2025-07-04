@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import RequireAuth from '../../components/RequireAuth';
-import Sidebar from '../../components/Sidebar';
+//import Sidebar from '../../components/Sidebar';
 import Image from 'next/image';
 import Link from 'next/link';
 import Card from '../../components/Card';
@@ -48,7 +48,6 @@ export default function StorePage() {
   return (
     <RequireAuth>
       <div className="flex min-h-screen">
-        <Sidebar />
         <main className="flex-1 bg-gray-100 p-4">
           <h1 className="text-3xl font-bold mb-6 text-gray-800">My Store</h1>
           <Link href="/dashboardStore/store/newStore">
@@ -64,12 +63,12 @@ export default function StorePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
               {stores.map((store) => (
                 <Card
-                key={store.id}
-                product={store}
-                cardClickHandler={(selectedStore) => {
-                  router.push(`/dashboardStore/store/${selectedStore.id}`);
-                }}
-              />
+                  key={store.id}
+                  product={store}
+                  cardClickHandler={(selectedStore) => {
+                    router.push(`/dashboardStore/store/${selectedStore.id}`);
+                  }}
+                />
               ))}
             </div>
           )}

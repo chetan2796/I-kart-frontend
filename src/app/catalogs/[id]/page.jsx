@@ -36,7 +36,7 @@ export default function editProducts({ params }) {
 
   const handleVariantChange = (type, value) => {
     setForm((prev) => {
-    const existing = prev.variants[type] || [];
+      const existing = prev.variants[type] || [];
       const updated = existing.includes(value)
         ? existing.filter((v) => v !== value)
         : [...existing, value];

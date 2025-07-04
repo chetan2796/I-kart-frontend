@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import Sidebar from "../../../components/Sidebar";
+//import Sidebar from "../../../components/Sidebar";
 import RequireAuth from "../../../components/RequireAuth";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -99,7 +99,6 @@ export default function ProductEditPage({ params }) {
   return (
     <RequireAuth>
       <div className="flex min-h-screen">
-        <Sidebar />
         <div className="flex-1 p-6">
           <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
             <div className="flex justify-between items-center mb-6">

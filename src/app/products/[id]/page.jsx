@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Sidebar from "../../components/Sidebar";
+//import Sidebar from "../../components/Sidebar";
 import RequireAuth from "../../components/RequireAuth";
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
@@ -57,7 +57,6 @@ export default function ProductPage({ params }) {
   return (
     <RequireAuth>
       <div className="flex min-h-screen">
-        <Sidebar />
         <div className="flex items-center justify-center flex-1 bg-gray-50 p-6">
           <div className="max-w-sm w-full border border-gray-200 bg-white rounded-lg shadow overflow-hidden relative">
             <div className="h-72 w-full overflow-hidden">

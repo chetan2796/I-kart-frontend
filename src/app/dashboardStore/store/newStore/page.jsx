@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import Sidebar from "../../../components/Sidebar";
+//import Sidebar from "../../../components/Sidebar";
 import RequireAuth from '../../../components/RequireAuth';
 import { useRouter } from 'next/navigation';
 
@@ -59,7 +59,7 @@ export default function AddStoreForm() {
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-      
+
       router.push("/dashboardStore/store");
       const result = await response.json();
       console.log('Store created successfully:', result);
@@ -71,7 +71,6 @@ export default function AddStoreForm() {
   return (
     <RequireAuth>
       <div className="flex min-h-screen bg-gray-100">
-        <Sidebar />
         <main className="flex-1 flex items-center justify-center p-8">
           <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8">
             <h1 className="text-3xl font-extrabold text-center text-gray-800 mb-8">

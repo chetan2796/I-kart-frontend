@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import Home from '../../src/app/page'
 import Login from '../../src/app/user/login/page'
-import router from 'next/router'
+import router from 'next/navigation'
  
 describe('Page', () => {
   it('renders a heading', () => {

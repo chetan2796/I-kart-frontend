@@ -1,5 +1,5 @@
 "use client";
-import Sidebar from "../components/Sidebar";
+//import Sidebar from "../components/Sidebar";
 import FabricCanvas from "../components/FabricCanvas";
 import RequireAuth from "../components/RequireAuth";
 import Link from "next/link";
@@ -25,7 +25,7 @@ const NewProducts = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        
+
         setProducts(data);
       } catch (err) {
         setError(err.message);
@@ -49,7 +49,6 @@ const NewProducts = () => {
   if (error) {
     return (
       <div className="flex min-h-screen">
-        <Sidebar />
         <div className="container mx-auto px-4 py-6">
           <h1 className="text-2xl font-bold mb-6">Products</h1>
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -69,7 +68,6 @@ const NewProducts = () => {
   return (
     <RequireAuth>
       <div className="flex min-h-screen">
-        <Sidebar />
         <div className="container mx-auto px-4 py-6">
           <h1 className="text-2xl font-bold mb-6">Catalogs</h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">

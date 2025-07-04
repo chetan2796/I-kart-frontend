@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import Sidebar from '../../../components/Sidebar';
+//import Sidebar from '../../../components/Sidebar';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -41,7 +41,7 @@ export default function StoreShowPage() {
     Promise.all([fetchStore(), fetchStoreProducts()]).finally(() => setLoading(false));
   }, [id]);
 
-  
+
   const fetchStoreProducts = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -104,9 +104,10 @@ export default function StoreShowPage() {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           productIds: selectedProductIds,
-          storeId: Number(id) }),
+          storeId: Number(id)
+        }),
       });
 
       if (!res.ok) throw new Error('Failed to add products');
@@ -144,7 +145,6 @@ export default function StoreShowPage() {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
       <main className="flex-1 bg-gray-100 p-8 relative">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-3xl font-bold">{store.name}</h1>
@@ -198,59 +198,58 @@ export default function StoreShowPage() {
 
         {/* Modal */}
         {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
-          <div className="bg-white w-full max-w-2xl p-6 rounded-lg shadow-lg max-h-[90vh] overflow-auto">
-            <h2 className="text-xl font-semibold mb-4">Select Products</h2>
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
+            <div className="bg-white w-full max-w-2xl p-6 rounded-lg shadow-lg max-h-[90vh] overflow-auto">
+              <h2 className="text-xl font-semibold mb-4">Select Products</h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 max-h-80 overflow-y-auto">
-              {products
-                .filter((product) => !storeProducts.some((storeProduct) => storeProduct.id === product.id))
-                .map((product) => (
-                <div
-                  key={product.id}
-                  className={`border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition relative cursor-pointer ${
-                    selectedProductIds.includes(product.id) ? 'ring-2 ring-blue-500' : ''
-                  }`}
-                  onClick={() => handleCheckboxChange(product.id)}
-                >
-                  <div className="relative h-32 w-full">
-                    <Image
-                      src={product.image || '/images/login-bg-image.png'}
-                      alt={product.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="p-3">
-                    <h3 className="text-md font-semibold text-gray-800">{product.name}</h3>
-                    <p className="text-sm text-gray-600">₹ {product.price}</p>
-                  </div>
-                  {selectedProductIds.includes(product.id) && (
-                    <div className="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
-                      Selected
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 max-h-80 overflow-y-auto">
+                {products
+                  .filter((product) => !storeProducts.some((storeProduct) => storeProduct.id === product.id))
+                  .map((product) => (
+                    <div
+                      key={product.id}
+                      className={`border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition relative cursor-pointer ${selectedProductIds.includes(product.id) ? 'ring-2 ring-blue-500' : ''
+                        }`}
+                      onClick={() => handleCheckboxChange(product.id)}
+                    >
+                      <div className="relative h-32 w-full">
+                        <Image
+                          src={product.image || '/images/login-bg-image.png'}
+                          alt={product.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="p-3">
+                        <h3 className="text-md font-semibold text-gray-800">{product.name}</h3>
+                        <p className="text-sm text-gray-600">₹ {product.price}</p>
+                      </div>
+                      {selectedProductIds.includes(product.id) && (
+                        <div className="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                          Selected
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
+                  ))}
+              </div>
 
-            <div className="flex justify-end space-x-2">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSubmit}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Submit
-              </button>
+              <div className="flex justify-end space-x-2">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Submit
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
 
       </main>
