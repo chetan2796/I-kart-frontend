@@ -45,7 +45,7 @@ export default function LoginPage() {
       if (response.ok) {
         localStorage.setItem("token", data.token);
         toast.success("login successful!");
-        router.push("/dashboardSeller");
+        router.push("/seller/dashboard");
       } else {
         toast.error(data.message || "login failed. Try again.");
       }

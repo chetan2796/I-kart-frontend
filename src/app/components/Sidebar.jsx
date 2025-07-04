@@ -12,7 +12,7 @@ export default function Sidebar() {
   const [signingOut, setSigningOut] = useState(false);
 
   const sidebarItems = [
-    { label: 'Dashboard', href: '/dashboardSeller' },
+    { label: 'Dashboard', href: '/seller/dashboard' },
     { label: 'Catalogs', href: '/catalogs' },
     { label: 'Stores', href: '/dashboardStore/store' },
   ];

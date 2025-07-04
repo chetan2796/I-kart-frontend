@@ -1,5 +1,5 @@
 "use client";
-import FabricCanvas from "../components/FabricCanvas";
+import FabricCanvas from "../../components/FabricCanvas";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect } from "react";
@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import Card from "../components/Card";
 //import RequireAuth from "../components/RequireAuth";
 import { useDispatch, useSelector } from "react-redux";
-import { setSelectedProduct } from "../lib/features/editProducts/editProductSlice";
+import { setSelectedProduct } from "../../lib/features/editProducts/editProductSlice";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -54,7 +54,7 @@ const DashboardSeller = () => {
   }, []);
 
   const cardClickHandler = (product) => {
-    router.push(`products/${product.id}`);
+    router.push(`/products/${product.slug}`);
     dispatch(setSelectedProduct(product));
   };
 

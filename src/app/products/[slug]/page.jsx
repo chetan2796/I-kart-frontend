@@ -8,14 +8,14 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function ProductPage({ params }) {
-  const { id } = React.use(params);
+  const { slug } = React.use(params);
   const [product, setProduct] = useState(null);
   const router = useRouter();
 
   const handleDeleteProduct = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/products/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/products/${slug}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -25,7 +25,7 @@ export default function ProductPage({ params }) {
       if (!res.ok) throw new Error('Failed to delete product');
       const data = await res.json();
       toast.success('Product deleted');
-      router.push('/dashboardSeller');
+      router.push('/seller/dashboard');
     } catch (error) {
       toast.error('Error deleting product:', error);
     }
@@ -35,7 +35,7 @@ export default function ProductPage({ params }) {
     const fetchProduct = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/products/${id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/products/${slug}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -49,8 +49,8 @@ export default function ProductPage({ params }) {
       }
     };
 
-    if (id) fetchProduct();
-  }, [id]);
+    if (slug) fetchProduct();
+  }, [slug]);
 
   if (!product) return <div className="flex justify-center items-center h-screen">Loading...</div>;
 
@@ -82,7 +82,7 @@ export default function ProductPage({ params }) {
             </div>
             <div className="text-2xl font-bold text-green-600 mb-4">${product.priceCents / 100}</div>
             <button className="w-full bg-gray-900 py-2 text-white rounded hover:bg-gray-700">Add to store</button>
-            <Link href={`/products/${id}/edit`}>
+            <Link href={`/products/${slug}/edit`}>
               <button className="w-full bg-blue-600 py-2 text-white rounded hover:bg-blue-700 mt-2 cursor-pointer">
                 Edit Product
               </button>

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function ProductEditPage({ params }) {
-  const { id } = React.use(params);
+  const { slug } = React.use(params);
   const router = useRouter();
   const [product, setProduct] = useState({
     name: '',
@@ -23,7 +23,7 @@ export default function ProductEditPage({ params }) {
     const fetchProduct = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/products/${id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/products/${slug}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -39,8 +39,8 @@ export default function ProductEditPage({ params }) {
       }
     };
 
-    if (id) fetchProduct();
-  }, [id]);
+    if (slug) fetchProduct();
+  }, [slug]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -77,7 +77,7 @@ export default function ProductEditPage({ params }) {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/products/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/products/${slug}`, {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -86,7 +86,7 @@ export default function ProductEditPage({ params }) {
         body: JSON.stringify(productPayload),
       });
       if (!res.ok) throw new Error('Failed to update product');
-      router.push(`/products/${id}`);
+      router.push(`/products/${slug}`);
     } catch (error) {
       console.error(error);
     } finally {
@@ -103,7 +103,7 @@ export default function ProductEditPage({ params }) {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-gray-900">Edit Product</h1>
             <Link
-              href={`/products/${id}`}
+              href={`/products/${slug}`}
               className="text-gray-500 hover:text-gray-700"
             >
               Cancel
