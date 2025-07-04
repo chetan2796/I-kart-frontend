@@ -509,7 +509,7 @@ export default function editProducts({ params }) {
         localStorage.setItem("email", form.email);
         localStorage.setItem("isLoggedIn", "true");
         toast.success("Product saved successfully!");
-        router.push('/dashboardSeller');
+        router.push('/seller/dashboard');
       } else {
         toast.error(data.message || "Error occurred while saving the product. Please try again.");
       }
