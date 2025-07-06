@@ -1,7 +1,7 @@
 'use client'
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { useRouter , usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useRef, useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { makeStore } from './lib/store'
@@ -26,7 +26,7 @@ export default function RootLayout({ children }) {
   }
 
   const pathname = usePathname();
-  const [hideSidebar, setHideSidebar] = useState(true); 
+  const [hideSidebar, setHideSidebar] = useState(false); 
 
   const publicRoutes = [
     '/user/login',
@@ -41,6 +41,7 @@ export default function RootLayout({ children }) {
     const token = localStorage.getItem('token');
     const isPublic = publicRoutes.includes(pathname) || numericPathRegex.test(pathname);
     
+
     if ((!token || isTokenExpired(token)) && !isPublic) {
       localStorage.clear();
       window.location.href = '/user/login'; 
@@ -49,6 +50,7 @@ export default function RootLayout({ children }) {
 
     setHideSidebar(isPublic);
   }, [pathname]);
+
 
   return (
     <html lang="en">

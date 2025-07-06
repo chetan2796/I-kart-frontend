@@ -18,7 +18,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="w-64 min-h-screen p-6 bg-gray-100 flex flex-col justify-between">
+    <div className="w-64 min-h-screen p-6 bg-gray-100 flex flex-col justify-between ">
       <div>
         <h2 className="text-2xl font-bold mb-6">I-Kart</h2>
         <ul className="space-y-4">
@@ -30,6 +30,7 @@ export default function Sidebar() {
                 pathname === href && 'bg-gray-200 font-semibold'
               )}
               key={href}
+              
             >
               <li>
                   {label}

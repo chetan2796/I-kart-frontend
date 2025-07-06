@@ -1,5 +1,5 @@
 "use client";
-import RequireAuth from "../components/RequireAuth";
+//import RequireAuth from "../components/RequireAuth";
 import { setSelectedProduct } from "../lib/features/editProducts/editProductSlice";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
@@ -41,7 +41,6 @@ const Catalogs = () => {
   if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
   
   return (
-    <RequireAuth>
       <div className="flex min-h-screen">
         <div className="container mx-auto px-4 py-6">
           <h1 className="text-2xl font-bold mb-6">Catalogs</h1>
@@ -52,7 +51,6 @@ const Catalogs = () => {
           </div>
         </div >
       </div>
-    </RequireAuth>
   );
 };
 

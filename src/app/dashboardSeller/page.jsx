@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useEffect } from "react";
 //import Sidebar from "../components/Sidebar";
 import Card from "../components/Card";
-import RequireAuth from "../components/RequireAuth";
+//import RequireAuth from "../components/RequireAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedProduct } from "../lib/features/editProducts/editProductSlice";
 import { useRouter } from "next/navigation";
@@ -59,7 +59,6 @@ const DashboardSeller = () => {
   };
 
   return (
-    <RequireAuth>
       <div className="flex min-h-screen">
         {/* Sidebar */}
 
@@ -85,7 +84,6 @@ const DashboardSeller = () => {
           </div>
         </div>
       </div>
-    </RequireAuth>
   );
 };
 

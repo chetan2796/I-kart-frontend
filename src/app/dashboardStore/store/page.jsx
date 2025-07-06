@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import RequireAuth from '../../components/RequireAuth';
+//import RequireAuth from '../../components/RequireAuth';
 //import Sidebar from '../../components/Sidebar';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -46,7 +46,6 @@ export default function StorePage() {
   };
 
   return (
-    <RequireAuth>
       <div className="flex min-h-screen">
         <main className="flex-1 bg-gray-100 p-4">
           <h1 className="text-3xl font-bold mb-6 text-gray-800">My Store</h1>
@@ -74,6 +73,5 @@ export default function StorePage() {
           )}
         </main>
       </div>
-    </RequireAuth>
   );
 }
