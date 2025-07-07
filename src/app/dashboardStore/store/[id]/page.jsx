@@ -1,10 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-//import Sidebar from '../../../components/Sidebar';
-import Image from 'next/image';
-import Link from 'next/link';
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function StoreShowPage() {
   const { id } = useParams();
@@ -18,15 +17,15 @@ export default function StoreShowPage() {
   useEffect(() => {
     const fetchStore = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         const res = await fetch(`http://localhost:3000/stores/${id}`, {
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         });
 
-        if (!res.ok) throw new Error('Failed to fetch store');
+        if (!res.ok) throw new Error("Failed to fetch store");
         const data = await res.json();
         setStore(data);
       } catch (error) {
@@ -38,17 +37,18 @@ export default function StoreShowPage() {
 
     if (!id) return;
     setLoading(true);
-    Promise.all([fetchStore(), fetchStoreProducts()]).finally(() => setLoading(false));
+    Promise.all([fetchStore(), fetchStoreProducts()]).finally(() =>
+      setLoading(false)
+    );
   }, [id]);
-
 
   const fetchStoreProducts = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const res = await fetch(`http://localhost:3000/store-products/${id}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
       });
 
@@ -56,25 +56,25 @@ export default function StoreShowPage() {
         setStoreProducts([]);
         return;
       }
-      if (!res.ok) throw new Error('Failed to fetch store products');
+      if (!res.ok) throw new Error("Failed to fetch store products");
       const data = await res.json();
       setStoreProducts(data);
     } catch (error) {
-      console.error('Error fetching store products:', error);
+      console.error("Error fetching store products:", error);
     }
   };
 
   const fetchProducts = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3000/products', {
+      const token = localStorage.getItem("token");
+      const res = await fetch("http://localhost:3000/products", {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
       });
 
-      if (!res.ok) throw new Error('Failed to fetch products');
+      if (!res.ok) throw new Error("Failed to fetch products");
       const data = await res.json();
       setProducts(data);
     } catch (error) {
@@ -97,46 +97,46 @@ export default function StoreShowPage() {
 
   const handleSubmit = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const res = await fetch(`http://localhost:3000/store-products`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           productIds: selectedProductIds,
-          storeId: Number(id)
+          storeId: Number(id),
         }),
       });
 
-      if (!res.ok) throw new Error('Failed to add products');
+      if (!res.ok) throw new Error("Failed to add products");
 
       setShowModal(false);
       setSelectedProductIds([]);
       await fetchStoreProducts();
     } catch (error) {
-      console.error('Error adding products:', error);
+      console.error("Error adding products:", error);
     }
   };
 
   const handleRemoveProduct = async (productId) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const res = await fetch(`http://localhost:3000/store-products/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ productId }),
       });
 
-      if (!res.ok) throw new Error('Failed to delete product from store');
+      if (!res.ok) throw new Error("Failed to delete product from store");
 
       await fetchStoreProducts();
     } catch (error) {
-      console.error('Error deleting product:', error);
+      console.error("Error deleting product:", error);
     }
   };
 
@@ -158,7 +158,7 @@ export default function StoreShowPage() {
 
         <div className="relative h-64 w-full mb-6">
           <Image
-            src={store.image || '/images/login-bg-image.png'}
+            src={store.image || "/images/login-bg-image.png"}
             alt={store.name}
             fill
             className="object-cover rounded"
@@ -181,7 +181,9 @@ export default function StoreShowPage() {
               </button>
 
               <div className="p-4">
-                <h2 className="text-lg font-semibold text-gray-800">{product.name}</h2>
+                <h2 className="text-lg font-semibold text-gray-800">
+                  {product.name}
+                </h2>
                 <p className="text-gray-600 mt-1">{product.description}</p>
                 <p className="text-blue-600 font-bold text-md mt-2">
                   ₹ {(product.priceCents / 100).toFixed(2)}
@@ -204,25 +206,37 @@ export default function StoreShowPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 max-h-80 overflow-y-auto">
                 {products
-                  .filter((product) => !storeProducts.some((storeProduct) => storeProduct.id === product.id))
+                  .filter(
+                    (product) =>
+                      !storeProducts.some(
+                        (storeProduct) => storeProduct.id === product.id
+                      )
+                  )
                   .map((product) => (
                     <div
                       key={product.id}
-                      className={`border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition relative cursor-pointer ${selectedProductIds.includes(product.id) ? 'ring-2 ring-blue-500' : ''
-                        }`}
+                      className={`border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition relative cursor-pointer ${
+                        selectedProductIds.includes(product.id)
+                          ? "ring-2 ring-blue-500"
+                          : ""
+                      }`}
                       onClick={() => handleCheckboxChange(product.id)}
                     >
                       <div className="relative h-32 w-full">
                         <Image
-                          src={product.image || '/images/login-bg-image.png'}
+                          src={product.image || "/images/login-bg-image.png"}
                           alt={product.name}
                           fill
                           className="object-cover"
                         />
                       </div>
                       <div className="p-3">
-                        <h3 className="text-md font-semibold text-gray-800">{product.name}</h3>
-                        <p className="text-sm text-gray-600">₹ {product.price}</p>
+                        <h3 className="text-md font-semibold text-gray-800">
+                          {product.name}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          ₹ {product.price}
+                        </p>
                       </div>
                       {selectedProductIds.includes(product.id) && (
                         <div className="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
@@ -250,8 +264,6 @@ export default function StoreShowPage() {
             </div>
           </div>
         )}
-
-
       </main>
     </div>
   );

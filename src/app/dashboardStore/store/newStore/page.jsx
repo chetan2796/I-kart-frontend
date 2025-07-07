@@ -1,15 +1,13 @@
-'use client';
+"use client";
 
-import { useMemo, useState } from 'react';
-//import Sidebar from "../../../components/Sidebar";
-//import RequireAuth from '../../../components/RequireAuth';
-import { useRouter } from 'next/navigation';
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AddStoreForm() {
   const slug = useMemo(() => `store-${crypto.randomUUID()}`, []);
   const router = useRouter();
   const [formData, setFormData] = useState({
-    name: '',
+    name: "",
     logo: null,
     banner: null,
     slug,
@@ -35,10 +33,14 @@ export default function AddStoreForm() {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
 
-      const logoBase64 = formData.logo ? await toBase64(formData.logo) : undefined;
-      const bannerBase64 = formData.banner ? await toBase64(formData.banner) : undefined;
+      const logoBase64 = formData.logo
+        ? await toBase64(formData.logo)
+        : undefined;
+      const bannerBase64 = formData.banner
+        ? await toBase64(formData.banner)
+        : undefined;
 
       const payload = {
         name: formData.name,
@@ -47,10 +49,10 @@ export default function AddStoreForm() {
         banner: bannerBase64,
       };
 
-      const response = await fetch('http://localhost:3000/stores', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3000/stores", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
@@ -62,9 +64,9 @@ export default function AddStoreForm() {
 
       router.push("/dashboardStore/store");
       const result = await response.json();
-      console.log('Store created successfully:', result);
+      console.log("Store created successfully:", result);
     } catch (error) {
-      console.error('Failed to create store:', error);
+      console.error("Failed to create store:", error);
     }
   };
 
@@ -77,7 +79,6 @@ export default function AddStoreForm() {
           </h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Store Name <span className="text-red-500">*</span>
@@ -93,7 +94,9 @@ export default function AddStoreForm() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Store Logo</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Store Logo
+              </label>
               <input
                 type="file"
                 name="logo"
@@ -104,7 +107,9 @@ export default function AddStoreForm() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Store Banner</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Store Banner
+              </label>
               <input
                 type="file"
                 name="banner"

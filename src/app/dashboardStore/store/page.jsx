@@ -1,9 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-//import RequireAuth from '../../components/RequireAuth';
-//import Sidebar from '../../components/Sidebar';
-import Image from 'next/image';
 import Link from 'next/link';
 import Card from '../../components/Card';
 import { useRouter } from 'next/navigation';
