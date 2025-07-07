@@ -6,7 +6,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from 'react-toastify';
 import { useRedirectIfAuthenticated } from '../../lib/hooks/useRedirectIfAuthenticated';
-import LoadingButton from "../../components/LoadingButton";
+import { Button } from "@/components/ui/button";
+import { Loader2Icon } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -75,9 +76,10 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <LoadingButton loading={loading} type="submit" className="w-full px-4 py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 cursor-pointer">
+            <Button className="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer" disabled={loading}>
+              {loading ? <Loader2Icon className="animate-spin" /> : null}
               Sign In
-            </LoadingButton>
+            </Button>
           </form>
 
           <p className="text-sm mt-4 text-gray-600">

@@ -3,7 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
-import LoadingButton from '../../components/LoadingButton';
+import { Button } from '@/components/ui/button';
+import { UploadIcon, Loader2Icon, X } from 'lucide-react';
 
 export default function editProducts({ params }) {
   const { id } = React.use(params);
@@ -20,6 +21,7 @@ export default function editProducts({ params }) {
   const [catalogVariants, setCatalogVariants] = useState([]);
   const [authToken, setAuthToken] = useState(null)
   const router = useRouter();
+  const fileInputRef = useRef(null);
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -626,13 +628,14 @@ export default function editProducts({ params }) {
                             }}
                           />
                         </div>
-                        <button
+                        <Button
+                          variant="secondary"
+                          size="icon"
+                          className="size-8 cursor-pointer absolute -top-1 -right-1 rounded-full"
                           onClick={() => deleteCachedImage(file.name)}
-                          className="absolute -top-1 -right-1 bg-red-500 text-white w-4 h-4 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-600 text-xs"
-                          title="Delete image"
                         >
-                          ×
-                        </button>
+                          <X color="#f00f0f" />
+                        </Button>
                       </div>
                     ))}
                   </div>
@@ -640,15 +643,14 @@ export default function editProducts({ params }) {
 
                 {/* Upload Image Button (only remaining action button) */}
                 <div className="grid grid-cols-1 gap-3">
-                  <button
-                    onClick={() => document.getElementById('fileUpload').click()}
-                    className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg transition-colors text-sm cursor-pointer"
+                  <Button
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
                   >
-                    <i className="fas fa-image"></i>
-                    Upload Image
-                  </button>
+                    <UploadIcon /> Upload Image
+                  </Button>
                   <input
-                    id="fileUpload"
+                    ref={fileInputRef}
                     type="file"
                     accept="image/*"
                     onChange={handleUpload}
@@ -745,9 +747,10 @@ export default function editProducts({ params }) {
                     />
 
                     {/* Submit Button */}
-                    <LoadingButton loading={loading} type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors cursor-pointer">
+                    <Button className="w-full cursor-pointer" disabled={loading}>
+                      {loading ? <Loader2Icon className="animate-spin" /> : null}
                       Create Product
-                    </LoadingButton>
+                    </Button>
                   </div>
                 </form>
 

@@ -5,6 +5,7 @@ import React, { useState, useEffect, useRef } from 'react';
 //import RequireAuth from "../../../components/RequireAuth";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 export default function ProductEditPage({ params }) {
   const { id } = React.use(params);
@@ -102,12 +103,6 @@ export default function ProductEditPage({ params }) {
         <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-gray-900">Edit Product</h1>
-            <Link
-              href={`/products/${id}`}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              Cancel
-            </Link>
           </div>
 
           <form onSubmit={handleSubmit}>
@@ -175,15 +170,16 @@ export default function ProductEditPage({ params }) {
                 </div>
               </div>
             ))}
-
-            <div className="flex justify-end mt-6">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
-              >
-                {isSubmitting ? 'Saving...' : 'Save Changes'}
-              </button>
+ 
+            <div className="flex justify-start space-x-4 pt-4">
+              <Button disabled={isSubmitting} className="cursor-pointer">
+                Update Product
+              </Button>
+              <Button asChild variant="secondary">
+                <Link href={`/products/${id}`}>
+                  Cancel
+                </Link>
+              </Button>
             </div>
           </form>
         </div>

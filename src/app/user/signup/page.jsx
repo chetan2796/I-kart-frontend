@@ -5,7 +5,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from 'react-toastify';
 import { useRedirectIfAuthenticated } from '../../lib/hooks/useRedirectIfAuthenticated';
-import LoadingButton from "../../components/LoadingButton";
+import { Button } from "@/components/ui/button";
+import { Loader2Icon } from "lucide-react";
 
 export default function User() {
   const router = useRouter();
@@ -103,9 +104,10 @@ export default function User() {
               <input type="text"  value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} placeholder="Enter your username" className="w-full px-4 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
             </div>
 
-            <LoadingButton loading={loading} type="submit" className="w-full px-4 py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 cursor-pointer">
+            <Button className="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer" disabled={loading}>
+              {loading ? <Loader2Icon className="animate-spin" /> : null}
               Sign Up
-            </LoadingButton>
+            </Button>
           </form>
 
           <p className="text-sm text-center text-gray-600">

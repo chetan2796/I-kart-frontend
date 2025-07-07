@@ -1,5 +1,5 @@
 "use client";
-//import RequireAuth from "../components/RequireAuth";
+
 import { setSelectedProduct } from "../lib/features/editProducts/editProductSlice";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
@@ -11,7 +11,6 @@ const Catalogs = () => {
   const router = useRouter();
   const [catalogs, setCatalogs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchCatalogs = async () => {
@@ -23,7 +22,6 @@ const Catalogs = () => {
         }
         setCatalogs(data);
       } catch (err) {
-        setError(err.message);
         console.error("Error fetching catalogs:", err);
       } finally {
         setLoading(false);

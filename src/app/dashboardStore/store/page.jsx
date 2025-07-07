@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Card from '../../components/Card';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 export default function StorePage() {
   const [stores, setStores] = useState([]);
@@ -38,37 +39,32 @@ export default function StorePage() {
     fetchStores();
   }, []);
 
-  const handleCardClick = (store) => {
-    router.push(`/dashboardStore/store/${store.id}`);
-  };
-
   return (
-      <div className="flex min-h-screen">
-        <main className="flex-1 bg-gray-100 p-4">
-          <h1 className="text-3xl font-bold mb-6 text-gray-800">My Store</h1>
+    <div className="container mx-auto px-4 py-6">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">Stores</h1>
+        <Button asChild>
           <Link href="/dashboardStore/store/newStore">
-            <button className="bg-gray-200 text-black px-4 py-2 rounded mb-6 hover:bg-gray-300 transition cursor-pointer">
-              New Store
-            </button>
+            New Store
           </Link>
-
-
-          {loading ? (
-            <p className="text-center text-gray-600">Loading stores...</p>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
-              {stores.map((store) => (
-                <Card
-                  key={store.id}
-                  product={store}
-                  cardClickHandler={(selectedStore) => {
-                    router.push(`/dashboardStore/store/${selectedStore.id}`);
-                  }}
-                />
-              ))}
-            </div>
-          )}
-        </main>
+        </Button>
       </div>
+
+      {loading ? (
+        <p className="text-center text-gray-600">Loading stores...</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+          {stores.map((store) => (
+            <Card
+              key={store.id}
+              product={store}
+              cardClickHandler={(selectedStore) => {
+                router.push(`/dashboardStore/store/${selectedStore.id}`);
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

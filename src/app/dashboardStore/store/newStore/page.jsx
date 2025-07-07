@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 export default function AddStoreForm() {
   const slug = useMemo(() => `store-${crypto.randomUUID()}`, []);
@@ -119,20 +120,17 @@ export default function AddStoreForm() {
               />
             </div>
 
-            <div className="flex justify-end space-x-4 pt-4">
-              <button
-                type="button"
-                onClick={() => window.history.back()}
-                className="px-5 py-2 text-sm font-semibold border border-red-400 text-red-600 rounded-lg hover:bg-red-50 transition"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-6 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition"
-              >
+            <div className="flex justify-start space-x-4">
+              <Button>
                 Create Store
-              </button>
+              </Button>
+              <Button
+                variant="secondary"
+                className="cursor-pointer"
+                onClick={() => window.history.back()}
+                >
+                Cancel
+              </Button>
             </div>
           </form>
         </div>

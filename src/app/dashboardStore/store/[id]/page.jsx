@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 
 export default function StoreShowPage() {
   const { id } = useParams();
@@ -148,12 +150,9 @@ export default function StoreShowPage() {
       <main className="flex-1 bg-gray-100 p-8 relative">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-3xl font-bold">{store.name}</h1>
-          <button
-            onClick={handleAddProductClick}
-            className="bg-gray-200 text-black px-4 py-2 rounded mb-6 hover:bg-gray-300 transition cursor-pointer"
-          >
+          <Button onClick={handleAddProductClick}>
             Add Product
-          </button>
+          </Button>
         </div>
 
         <div className="relative h-64 w-full mb-6">
@@ -172,14 +171,14 @@ export default function StoreShowPage() {
               key={product.id}
               className="relative group bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden"
             >
-              <button
+              <Button
+                variant="secondary"
+                size="icon"
+                className="size-8 cursor-pointer absolute top-2 right-2"
                 onClick={() => handleRemoveProduct(product.id)}
-                className="absolute top-2 right-2 text-red-500 bg-white rounded-full p-1 shadow opacity-0 group-hover:opacity-100 transition"
-                title="Remove product"
               >
-                ❌
-              </button>
-
+                <X color="#f00f0f" />
+              </Button>
               <div className="p-4">
                 <h2 className="text-lg font-semibold text-gray-800">
                   {product.name}
@@ -188,11 +187,9 @@ export default function StoreShowPage() {
                 <p className="text-blue-600 font-bold text-md mt-2">
                   ₹ {(product.priceCents / 100).toFixed(2)}
                 </p>
-                <Link href={`/products/${product.id}`}>
-                  <button className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
-                    View Product
-                  </button>
-                </Link>
+                <Button asChild className="mt-2">
+                  <Link href={`/products/${product.id}`}>View Product</Link>
+                </Button>
               </div>
             </div>
           ))}
@@ -248,18 +245,12 @@ export default function StoreShowPage() {
               </div>
 
               <div className="flex justify-end space-x-2">
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                >
+                <Button variant="secondary" onClick={() => setShowModal(false)}>
                   Cancel
-                </button>
-                <button
-                  onClick={handleSubmit}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
+                </Button>
+                <Button onClick={handleSubmit}>
                   Submit
-                </button>
+                </Button>
               </div>
             </div>
           </div>

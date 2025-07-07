@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { handleSignout } from '../lib/signout';
 import clsx from 'clsx';
 import { useState } from 'react';
+import { Button } from "@/components/ui/button";
 
 export default function Sidebar() {
   const router = useRouter();
@@ -40,15 +41,14 @@ export default function Sidebar() {
         </ul>
       </div>
 
-      <div>
-        <button
-          onClick={() => handleSignout(router, setSigningOut)}
-          className={clsx('w-full text-left p-2 rounded cursor-pointer hover:bg-gray-200 disabled:opacity-50', signingOut && 'bg-gray-300 font-semibold')}
-          disabled={signingOut}
-        >
-          {signingOut ? 'Signing out...' : 'Sign out'}
-        </button>
-      </div>
+      <Button
+        variant="destructive"
+        className="cursor-pointer"
+        onClick={() => handleSignout(router, setSigningOut)}
+        disabled={signingOut}
+      >
+        {signingOut ? 'Signing out...' : 'Sign out'}
+      </Button>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export default function ProductPage({ params }) {
   const { id } = React.use(params);
@@ -81,18 +82,17 @@ export default function ProductPage({ params }) {
               ))}
             </div>
             <div className="text-2xl font-bold text-green-600 mb-4">${product.priceCents / 100}</div>
-            <button className="w-full bg-gray-900 py-2 text-white rounded hover:bg-gray-700">Add to store</button>
-            <Link href={`/products/${id}/edit`}>
-              <button className="w-full bg-blue-600 py-2 text-white rounded hover:bg-blue-700 mt-2 cursor-pointer">
+            <Button variant="ghost" className="w-full mt-2">
+              Add to store
+            </Button>
+            <Button asChild variant="secondary" className="w-full mt-2">
+              <Link href={`/products/${id}/edit`}>
                 Edit Product
-              </button>
-            </Link>
-            <button
-              onClick={handleDeleteProduct}
-              className="w-full bg-red-600 py-2 text-white rounded hover:bg-red-700 mt-2 cursor-pointer"
-            >
+              </Link>
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteProduct} className="w-full mt-2">
               Delete Product
-            </button>
+            </Button>
           </div>
         </div>
       </div>
