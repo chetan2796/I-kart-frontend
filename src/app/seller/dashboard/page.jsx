@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect } from "react";
 //import Sidebar from "../components/Sidebar";
-import Card from "../components/Card";
+import Card from "../../components/Card";
 //import RequireAuth from "../components/RequireAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedProduct } from "../../lib/features/editProducts/editProductSlice";
