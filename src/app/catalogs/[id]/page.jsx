@@ -5,6 +5,9 @@ import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { UploadIcon, Loader2Icon, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 export default function editProducts({ params }) {
   const { id } = React.use(params);
@@ -549,25 +552,15 @@ export default function editProducts({ params }) {
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
       </Head>
 
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        <div className="container mx-auto px-4 py-6 flex-1">
-          {/* Header */}
-          <header className="mb-6 text-center">
-            <h1 className="text-3xl font-bold text-indigo-700 mb-2">Design Your Product</h1>
-            <p className="text-gray-600">Create a custom design for your {productType}</p>
-          </header>
-
+      <div className="flex min-h-screen">
+        <div className="container mx-auto px-4 py-6">
           {/* Main Content Area */}
           <div className="flex flex-col h-full">
+            <h1 className="text-2xl font-bold mb-6">Design Your Product</h1>
+
             {/* Canvas Area - Takes remaining space */}
             <div className="flex-1 mb-4">
               <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 h-full">
-                <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-200">
-                  <h2 className="font-semibold text-gray-700 flex items-center gap-2">
-                    <i className="fas fa-paint-brush text-indigo-500"></i>
-                    Design Canvas
-                  </h2>
-                </div>
                 <div className="p-4 h-[calc(100%-68px)] flex items-center justify-center">
                   <canvas
                     ref={canvasRef}
@@ -581,13 +574,6 @@ export default function editProducts({ params }) {
 
             {/* Bottom Controls Panel */}
             <div className="w-full bg-white rounded-xl shadow-lg border border-gray-200">
-              <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-200">
-                <h2 className="font-semibold text-gray-700 flex items-center gap-2">
-                  <i className="fas fa-sliders-h text-indigo-500"></i>
-                  Design Tools
-                </h2>
-              </div>
-
               <div className="p-4 space-y-4">
                 {/* Recent Images - Moved above Upload button */}
                 <div className="mt-2">
@@ -661,72 +647,48 @@ export default function editProducts({ params }) {
                 {/* Product Creation Form */}
                 <form onSubmit={handleSubmit}>
                   <div className="mt-4 space-y-4">
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Product Name
-                      </label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={form.name}
-                        onChange={handleInputChange}
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        placeholder="Enter product name"
-                        required
-                      />
-                    </div>
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                      name="name"
+                      type="text"
+                      placeholder="Enter product name"
+                      value={form.name}
+                      onChange={handleInputChange}
+                      required
+                    />
 
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Description
-                      </label>
-                      <textarea
-                        rows={3}
-                        name="description"
-                        value={form.description}
-                        onChange={handleInputChange}
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        placeholder="Enter product description"
-                        required
-                      />
-                    </div>
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      name="description"
+                      type="text"
+                      placeholder="Enter product description"
+                      value={form.description}
+                      onChange={handleInputChange}
+                      required
+                    />
 
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Price
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="number"
-                          step="0.01"
-                          name="price"
-                          value={form.price}
-                          onChange={handleInputChange}
-                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                          placeholder="0.00"
-                          required
-                        />
-                        <span className="absolute right-3 top-2 text-gray-500">USD</span>
-                      </div>
-                    </div>
+                    <Label htmlFor="price">Price (USD)</Label>
+                    <Input
+                      name="price"
+                      type="number"
+                      placeholder="Enter price"
+                      min={0}
+                      value={form.price}
+                      onChange={handleInputChange}
+                      required
+                    />
 
                     {/* Variants Section */}
                     <div className="mb-4">
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">
-                        {Object.entries(catalogVariants).length > 0 && 'Product Variants'}
-                      </h4>
                       {Object.entries(catalogVariants).map(([variantName, options]) => (
-                        <div key={variantName} className="border-b pb-3">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="font-medium">{variantName}</span>
-                          </div>
+                        <div key={variantName} className="mb-2">
+                          <Label htmlFor={variantName}>{variantName}</Label>
                           <div className="flex flex-wrap gap-3">
                             {options.map((option) => (
                               <label key={option} className="inline-flex items-center">
-                                <input
+                                <Input
                                   type="checkbox"
                                   onChange={() => handleVariantChange(variantName, option)}
-                                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                                 />
                                 <span className="ml-2 text-gray-700">{option}</span>
                               </label>

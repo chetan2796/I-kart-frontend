@@ -3,6 +3,8 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 export default function AddStoreForm() {
   const slug = useMemo(() => `store-${crypto.randomUUID()}`, []);
@@ -80,45 +82,32 @@ export default function AddStoreForm() {
           </h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Store Name <span className="text-red-500">*</span>
-              </label>
-              <input
+              <Label htmlFor="name">Name</Label>
+              <Input
                 type="text"
                 name="name"
-                required
+                placeholder="Enter store name"
                 onChange={handleChange}
-                placeholder="Enter your store name"
-                className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800"
+                required
               />
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Store Logo
-              </label>
-              <input
+              <Label htmlFor="logo">Logo</Label>
+              <Input
                 type="file"
                 name="logo"
                 accept="image/*"
                 onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-lg shadow-sm text-gray-800 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
+                required
               />
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Store Banner
-              </label>
-              <input
+              <Label htmlFor="banner">Banner</Label>
+              <Input
                 type="file"
                 name="banner"
                 accept="image/*"
                 onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-lg shadow-sm text-gray-800 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200"
+                required
               />
-            </div>
 
             <div className="flex justify-start space-x-4">
               <Button>

@@ -7,6 +7,8 @@ import { toast } from 'react-toastify';
 import { useRedirectIfAuthenticated } from '../../lib/hooks/useRedirectIfAuthenticated';
 import { Button } from "@/components/ui/button";
 import { Loader2Icon } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 export default function User() {
   const router = useRouter();
@@ -89,20 +91,31 @@ export default function User() {
           <h1 className="text-3xl font-bold text-center text-gray-800">Sign Up</h1>
 
           <form id= "signupForm" onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">Email</label>
-              <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="Enter your email" className="w-full px-4 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-            </div>
+            <Label htmlFor="email">Email address</Label>
+            <Input
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              placeholder="Enter email address"
+            />
 
-            <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">Phone</label>
-              <input type="text"  value={form.phone} onChange={(e) => { const onlyNums = e.target.value.replace(/[^0-9]/g, ''); setForm({ ...form, phone: onlyNums }); }} placeholder="Enter your phone number" className="w-full px-4 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" maxLength={10} pattern="[0-9]*"/>
-            </div>
+            <Label htmlFor="phone">Phone number</Label>
+            <Input
+              type="text"
+              value={form.phone}
+              onChange={(e) => { setForm({ ...form, phone: e.target.value.replace(/[^0-9]/g, '') }) }}
+              placeholder="Enter phone number"
+              maxLength={10}
+              pattern="[0-9]*"
+            />
 
-            <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">Username</label>
-              <input type="text"  value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} placeholder="Enter your username" className="w-full px-4 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-            </div>
+            <Label htmlFor="username">Username</Label>
+            <Input
+              type="text"
+              value={form.username}
+              onChange={(e) => setForm({ ...form, username: e.target.value })}
+              placeholder="Enter your username"
+            />
 
             <Button className="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer" disabled={loading}>
               {loading ? <Loader2Icon className="animate-spin" /> : null}

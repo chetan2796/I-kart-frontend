@@ -8,6 +8,12 @@ import { toast } from 'react-toastify';
 import { useRedirectIfAuthenticated } from '../../lib/hooks/useRedirectIfAuthenticated';
 import { Button } from "@/components/ui/button";
 import { Loader2Icon } from "lucide-react";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp"
 
 export default function LoginPage() {
   const router = useRouter();
@@ -62,17 +68,30 @@ export default function LoginPage() {
     <div className="flex min-h-screen">
       <div className="w-full md:w-1/2 flex items-center justify-center p-10 bg-white">
         <div className="max-w-md w-full">
-          <h1 className="text-xl font-bold mb-1 text-gray-700">Start your journey</h1>
-          <h1 className="text-4xl font-bold mb-6 text-gray-700">Sign In to i-kart</h1>
+          <h1 className="text-xl font-bold mb-1 text-gray-700">Verify your identity</h1>
+          <h1 className="text-4xl font-bold mb-6 text-gray-700">Enter OTP to continue</h1>
           <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">
-                OTP
-              </label>
-              <div className="relative">
-                <input type="text" name="code" placeholder="Enter OTP"  value={form.code} onChange={(e) => setForm({ code: e.target.value })
-                } className="w-full px-4 py-2 pr-10 border border-blue-400 rounded-md focus:outline-none focus:ring-2 text-black focus:ring-blue-500" />
-              </div>
+            <div className="flex justify-center">
+              <InputOTP
+                maxLength={6}
+                value={form.code}
+                onChange={(value) => setForm({ code: value })}
+              >
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                </InputOTPGroup>
+                <InputOTPSeparator />
+                <InputOTPGroup>
+                  <InputOTPSlot index={2} />
+                  <InputOTPSlot index={3} />
+                </InputOTPGroup>
+                <InputOTPSeparator />
+                <InputOTPGroup>
+                  <InputOTPSlot index={4} />
+                  <InputOTPSlot index={5} />
+                </InputOTPGroup>
+              </InputOTP>
             </div>
 
             <Button className="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer" disabled={loading}>

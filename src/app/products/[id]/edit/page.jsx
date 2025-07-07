@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-//import Sidebar from "../../../components/Sidebar";
-//import RequireAuth from "../../../components/RequireAuth";
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 export default function ProductEditPage({ params }) {
   const { id } = React.use(params);
@@ -69,7 +70,10 @@ export default function ProductEditPage({ params }) {
       priceCurrency: product.priceCurrency,
       slug: product.slug,
       categoryId: product.categoryId,
-      productVariants: product.productVariants,
+      productVariants: product.productVariants.map(option => ({
+        optionName: option.optionName,
+        optionValues: option.optionValues
+      })),
       productImages: product.productImages.map(image => ({
         url: image.url,
         altText: image.altText
@@ -102,68 +106,50 @@ export default function ProductEditPage({ params }) {
       <div className="flex-1 p-6">
         <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Edit Product</h1>
+            <h1 className="text-2xl font-bold">Edit Product</h1>
           </div>
 
           <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-                Product Name
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={product.name}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded shadow appearance-none"
-                required
-              />
-            </div>
+            <Label htmlFor="name">Name</Label>
+            <Input
+              type="text"
+              name="name"
+              value={product.name}
+              onChange={handleChange}
+              className="mb-4"
+              required
+            />
 
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
-                Description
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                value={product.description}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded shadow appearance-none"
-                rows="4"
-              />
-            </div>
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              name="description"
+              value={product.description}
+              onChange={handleChange}
+              className="mb-4"
+              required
+            />
 
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="price">
-                Price ($)
-              </label>
-              <input
-                type="number"
-                id="price"
-                name="priceCents"
-                value={(product.priceCents / 100).toFixed(2)}
-                onChange={handleChange}
-                step="0.01"
-                min="0"
-                className="w-full px-3 py-2 border rounded shadow appearance-none"
-                required
-              />
-            </div>
+            <Label htmlFor="price">Price ($)</Label>
+            <Input
+              type="number"
+              name="priceCents"
+              value={(product.priceCents / 100)}
+              onChange={handleChange}
+              className="mb-4"
+              min="0"
+              required
+            />
 
             {product.productVariants?.map((variant, variantIndex) => (
-              <div key={variantIndex} className="mb-4 border-b pb-4">
-                <h3 className="text-lg font-semibold mb-2">{variant.optionName}</h3>
+              <div key={variantIndex} className="mb-4">
+                <Label htmlFor={variant.optionName}>{variant.optionName}</Label>
                 <div className="space-y-2">
                   {variant.optionValues.map((value, optionIndex) => (
                     <div key={optionIndex} className="flex items-center">
-                      <input
+                      <Input
                         type="text"
                         value={value}
-                        onChange={(e) => handleVariantChange(variantIndex, optionIndex, e.target.value)}
-                        className="w-full px-3 py-2 border rounded shadow appearance-none"
-                        required
+                        readOnly
                       />
                     </div>
                   ))}

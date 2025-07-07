@@ -8,6 +8,8 @@ import { toast } from 'react-toastify';
 import { useRedirectIfAuthenticated } from '../../lib/hooks/useRedirectIfAuthenticated';
 import { Button } from "@/components/ui/button";
 import { Loader2Icon } from "lucide-react";
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -66,15 +68,14 @@ export default function LoginPage() {
           <h1 className="text-xl font-bold mb-1 text-gray-700">Start your journey</h1>
           <h1 className="text-4xl font-bold mb-6 text-gray-700">Sign In to i-kart</h1>
           <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">
-                E-mail address
-              </label>
-              <div className="relative">
-                <input type="email" name="email" placeholder="example@email.com" value={form.email} onChange={(e) => setForm({ email: e.target.value })
-                } className="w-full px-4 py-2 pr-10 border border-blue-400 rounded-md focus:outline-none focus:ring-2 text-black focus:ring-blue-500" />
-              </div>
-            </div>
+            <Label htmlFor="email">Email address</Label>
+
+            <Input
+              type="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={(e) => setForm({email: e.target.value})}
+            />
 
             <Button className="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer" disabled={loading}>
               {loading ? <Loader2Icon className="animate-spin" /> : null}
