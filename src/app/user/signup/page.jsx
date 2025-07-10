@@ -4,16 +4,12 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from 'react-toastify';
-import { useRedirectIfAuthenticated } from '../../lib/hooks/useRedirectIfAuthenticated';
 import LoadingButton from "../../components/LoadingButton";
 
 export default function User() {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", phone: "", username: "" });
   const [loading, setLoading] = useState(false);
-
-  const checking = useRedirectIfAuthenticated();
-  if (checking) return null;
 
   const handleSubmit = async (e) => {
   e.preventDefault();

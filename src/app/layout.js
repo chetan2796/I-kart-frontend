@@ -26,7 +26,7 @@ export default function RootLayout({ children }) {
   }
 
   const pathname = usePathname();
-  const [hideSidebar, setHideSidebar] = useState(false); 
+  const [hideSidebar, setHideSidebar] = useState(false);
 
   const publicRoutes = [
     '/user/login',
@@ -38,18 +38,34 @@ export default function RootLayout({ children }) {
   const numericPathRegex = /^\/[0-9]+(\/.*)?$/;
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
     const isPublic = publicRoutes.includes(pathname) || numericPathRegex.test(pathname);
-    
 
-    if ((!token || isTokenExpired(token)) && !isPublic) {
-      localStorage.clear();
-      window.location.href = '/user/login'; 
-      return;
-    }
+    const checkAuth = async () => {
+      if (isPublic) {
+        setHideSidebar(true);
+        return;
+      }
 
-    setHideSidebar(isPublic);
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/check`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        if (!res.ok) {
+          throw new Error('Auth failed');
+        }
+
+        setHideSidebar(false);
+      } catch (err) {
+        console.error('Auth error:', err);
+        window.location.href = '/user/login';
+      }
+    };
+
+    checkAuth();
   }, [pathname]);
+
 
 
   return (

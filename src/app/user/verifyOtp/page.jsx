@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from 'react-toastify';
-import { useRedirectIfAuthenticated } from '../../lib/hooks/useRedirectIfAuthenticated';
 import LoadingButton from "../../components/LoadingButton";
 
 export default function LoginPage() {
@@ -13,45 +12,54 @@ export default function LoginPage() {
   const [form, setForm] = useState({ code: "", email: "" });
   const [loading, setLoading] = useState(false);
 
-  const checking = useRedirectIfAuthenticated();
-  if (checking) return null;
-
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    if (!form.code) {
-      toast.error('Otp is required');
+    const email = form.email || localStorage.getItem("email");
+  
+    if (!form.code || !email) {
+      toast.error("OTP and email are required.");
       return;
     }
-
+  
     setLoading(true);
-    const email = form.email || localStorage.getItem("email");
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/otp/verify`, {        
+      // 1. Verify OTP
+      const verifyResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/otp/verify`, {
         method: "POST",
-        headers: {
+        credentials: "include", 
+        headers: { 
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          code: form.code,
-          email
+        body: JSON.stringify({ 
+          code: form.code, 
+          email 
         }),
       });
 
-      const data = await response.json();
-      localStorage.setItem("token", data.token);
-      console.log("data==>>", data)
-
-      if (response.ok) {
-        localStorage.setItem("token", data.token);
-        toast.success("login successful!");
-        router.push("/seller/dashboard");
-      } else {
-        toast.error(data.message || "login failed. Try again.");
+      if (!verifyResponse.ok) {
+        const errorData = await verifyResponse.json().catch(() => ({}));
+        throw new Error(errorData.message || "OTP verification failed");
       }
-    } catch (error) {
-      console.error("login error:", error);
-      toast.error("Something went wrong. Please try again.");
+  
+      // 2. Check authentication status
+      const authCheckResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/check`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+  
+      if (!authCheckResponse.ok) {
+        throw new Error("Authentication check failed");
+      }
+  
+      toast.success("Login successful!");
+      router.push("/seller/dashboard");
+  
+    } catch (err) {
+      console.error("Login error:", err);
+      toast.error(err.message || "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -69,7 +77,7 @@ export default function LoginPage() {
                 OTP
               </label>
               <div className="relative">
-                <input type="text" name="code" placeholder="Enter OTP"  value={form.code} onChange={(e) => setForm({ code: e.target.value })
+                <input type="text" name="code" placeholder="Enter OTP" value={form.code} onChange={(e) => setForm({ code: e.target.value })
                 } className="w-full px-4 py-2 pr-10 border border-blue-400 rounded-md focus:outline-none focus:ring-2 text-black focus:ring-blue-500" />
               </div>
             </div>

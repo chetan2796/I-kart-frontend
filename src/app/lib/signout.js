@@ -10,10 +10,7 @@ export const handleSignout = async (router, setLoading) => {
 
     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/signout`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
+      credentials: 'include',
     });
 
     if (!response.ok) {

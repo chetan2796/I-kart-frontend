@@ -3,87 +3,99 @@ import FabricCanvas from "../../components/FabricCanvas";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect } from "react";
-//import Sidebar from "../components/Sidebar";
 import Card from "../../components/Card";
-//import RequireAuth from "../components/RequireAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedProduct } from "../../lib/features/editProducts/editProductSlice";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const DashboardSeller = () => {
-  const dispatch = useDispatch();
   const router = useRouter();
+  const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      const authToken = localStorage.getItem("token");
+    const authenticateAndFetch = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/products`, {
-          method: "GET",
+        const authCheckResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/check`, {
+          method: 'GET',
+          credentials: 'include',
           headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${authToken}`,
+            'Content-Type': 'application/json',
           },
         });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+
+        if (!authCheckResponse.ok) {
+          throw new Error('Authentication check failed');
         }
-        const data = await response.json();
-        setProducts(data);
+
+        const userResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/me`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        if (!userResponse.ok) {
+          throw new Error('Failed to fetch user info');
+        }
+
+        const userData = await userResponse.json();
+
+        if (userData.roleId !== 2) {
+          router.push('/unauthorized');
+          return;
+        }
+
+        setUser(userData);
+
+        const productResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/products`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!productResponse.ok) {
+          throw new Error(`Failed to fetch products. Status: ${productResponse.status}`);
+        }
+
+        const productsData = await productResponse.json();
+        setProducts(productsData);
+
       } catch (err) {
-        setError(err.message);
-        console.error("Error fetching products:", err);
-      } finally {
-        setLoading(false);
+        console.error(err);
+        router.push('/user/login');
       }
     };
 
-    fetchProducts();
-  }, []);
-
-  const getData = async () => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/`);
-  };
-
-  useEffect(() => {
-    getData();
+    authenticateAndFetch();
   }, []);
 
   const cardClickHandler = (product) => {
-    router.push(`/products/${product.slug}`);
-    dispatch(setSelectedProduct(product));
+    router.push(`products/${product.id}`);
   };
 
+  if (!user) return <p>Loading...</p>;
+
   return (
-      <div className="flex min-h-screen">
-        {/* Sidebar */}
-
-        {/* Main Content */}
-        <div className="flex-1 px-4 py-6">
-          <h1 className="text-3xl font-bold mb-6 text-gray-800">Products</h1>
-
-          <Link href="/catalogs">
-            <button className="bg-gray-200 text-black px-4 py-2 rounded mb-6 hover:bg-gray-300 transition cursor-pointer">
-              New Product
-            </button>
-          </Link>
-
-          {/* Product Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
-            {products.map((product, index) => (
-              <Card
-                cardClickHandler={cardClickHandler}
-                product={product}
-                key={product.id}
-              />
-            ))}
-          </div>
-        </div>
+    <div className="container mx-auto px-4 py-6">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">Products</h1>
+        <Link href="/products/add" className="btn btn-primary">
+          Add Product
+        </Link>
       </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
+        {products.map((product) => (
+          <Card
+            cardClickHandler={cardClickHandler}
+            product={product}
+            key={product.id}
+          />
+        ))}
+      </div>
+    </div>
   );
 };
 
